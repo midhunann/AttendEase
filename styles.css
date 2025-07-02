@@ -1,0 +1,377 @@
+/* Amrita AttendEase - Floating Widget Styles */
+
+.amrita-widget {
+  position: fixed !important;
+  top: 20px !important;
+  right: 20px !important;
+  width: 380px !important;
+  max-height: 80vh !important;
+  background: #ffffff !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+  z-index: 999999 !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+  border: 1px solid #e1e5e9 !important;
+  overflow: hidden !important;
+  transition: all 0.3s ease !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+.amrita-widget.hidden {
+  opacity: 0 !important;
+  transform: translate3d(400px, 0, 0) !important;
+  pointer-events: none !important;
+}
+
+.amrita-widget.minimized {
+  height: 50px !important;
+  overflow: hidden !important;
+}
+
+.amrita-widget.minimized .widget-content {
+  display: none !important;
+}
+
+/* Widget Header */
+.widget-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+  padding: 12px 16px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  cursor: move !important;
+  user-select: none !important;
+}
+
+.widget-title {
+  display: flex !important;
+  align-items: center !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+}
+
+.widget-icon {
+  margin-right: 8px !important;
+  font-size: 18px !important;
+}
+
+.widget-controls {
+  display: flex !important;
+  gap: 4px !important;
+}
+
+.control-btn {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: none !important;
+  color: white !important;
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 14px !important;
+  transition: background-color 0.2s !important;
+}
+
+.control-btn:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Widget Content */
+.widget-content {
+  padding: 16px !important;
+  max-height: calc(80vh - 50px) !important;
+  overflow-y: auto !important;
+}
+
+.widget-content::-webkit-scrollbar {
+  width: 6px !important;
+}
+
+.widget-content::-webkit-scrollbar-track {
+  background: #f1f3f4 !important;
+}
+
+.widget-content::-webkit-scrollbar-thumb {
+  background: #c1c8cd !important;
+  border-radius: 3px !important;
+}
+
+/* Overall Stats */
+.overall-stats {
+  background: #f8f9fa !important;
+  border-radius: 8px !important;
+  padding: 12px !important;
+  margin-bottom: 16px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+}
+
+.stat-item {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+.stat-label {
+  font-size: 12px !important;
+  color: #666 !important;
+  margin-bottom: 4px !important;
+}
+
+.stat-value {
+  font-weight: 600 !important;
+  font-size: 14px !important;
+}
+
+.stat-value.status-safe {
+  color: #28a745 !important;
+}
+
+.stat-value.status-warning {
+  color: #ffc107 !important;
+}
+
+.stat-value.status-danger {
+  color: #dc3545 !important;
+}
+
+/* Subjects List */
+.subjects-list {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+}
+
+/* Subject Cards */
+.subject-card {
+  border-radius: 8px !important;
+  padding: 12px !important;
+  border-left: 4px solid #ddd !important;
+  background: #fafafa !important;
+  transition: all 0.2s ease !important;
+}
+
+.subject-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.subject-card.status-safe {
+  border-left-color: #28a745 !important;
+  background: #f8fff9 !important;
+}
+
+.subject-card.status-warning {
+  border-left-color: #ffc107 !important;
+  background: #fffef8 !important;
+}
+
+.subject-card.status-danger {
+  border-left-color: #dc3545 !important;
+  background: #fff8f8 !important;
+}
+
+/* Subject Header */
+.subject-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  margin-bottom: 8px !important;
+}
+
+.subject-info {
+  flex: 1 !important;
+}
+
+.course-code {
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  color: #333 !important;
+  margin-bottom: 2px !important;
+}
+
+.course-name {
+  font-size: 12px !important;
+  color: #666 !important;
+  line-height: 1.3 !important;
+}
+
+.attendance-percentage {
+  font-weight: 700 !important;
+  font-size: 18px !important;
+  padding: 4px 8px !important;
+  border-radius: 20px !important;
+  background: #f0f0f0 !important;
+}
+
+.attendance-percentage.safe {
+  background: #d4edda !important;
+  color: #155724 !important;
+}
+
+.attendance-percentage.warning {
+  background: #fff3cd !important;
+  color: #856404 !important;
+}
+
+.attendance-percentage.danger {
+  background: #f8d7da !important;
+  color: #721c24 !important;
+}
+
+/* Progress Bar */
+.progress-bar {
+  position: relative !important;
+  height: 6px !important;
+  background: #e9ecef !important;
+  border-radius: 3px !important;
+  margin: 8px 0 !important;
+  overflow: hidden !important;
+}
+
+.progress-fill {
+  height: 100% !important;
+  background: linear-gradient(90deg, #dc3545 0%, #ffc107 60%, #28a745 80%) !important;
+  border-radius: 3px !important;
+  transition: width 0.3s ease !important;
+}
+
+.progress-target {
+  position: absolute !important;
+  top: -2px !important;
+  width: 2px !important;
+  height: 10px !important;
+  background: #333 !important;
+  border-radius: 1px !important;
+}
+
+.progress-target::before {
+  content: '75%' !important;
+  position: absolute !important;
+  top: -18px !important;
+  left: -8px !important;
+  font-size: 10px !important;
+  color: #666 !important;
+  font-weight: 500 !important;
+}
+
+/* Subject Stats */
+.subject-stats {
+  display: flex !important;
+  justify-content: space-between !important;
+  margin: 8px 0 !important;
+}
+
+.stat {
+  text-align: center !important;
+  flex: 1 !important;
+}
+
+.stat-number {
+  display: block !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  color: #333 !important;
+}
+
+.stat-text {
+  font-size: 11px !important;
+  color: #666 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* Calculation Result */
+.calculation-result {
+  background: rgba(0, 0, 0, 0.05) !important;
+  border-radius: 6px !important;
+  padding: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-top: 8px !important;
+}
+
+.calculation-icon {
+  font-size: 16px !important;
+}
+
+.calculation-text {
+  font-size: 12px !important;
+  color: #333 !important;
+  font-weight: 500 !important;
+  flex: 1 !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .amrita-widget {
+    width: calc(100vw - 40px) !important;
+    right: 20px !important;
+    left: 20px !important;
+    max-width: 400px !important;
+  }
+}
+
+/* Animation for widget appearance */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translate3d(400px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.amrita-widget:not(.hidden) {
+  animation: slideInRight 0.3s ease-out !important;
+}
+
+/* Notification styles for critical attendance */
+.subject-card.status-danger {
+  animation: pulse 2s infinite !important;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .amrita-widget {
+    border: 2px solid #000 !important;
+  }
+  
+  .subject-card {
+    border: 1px solid #666 !important;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .amrita-widget,
+  .progress-fill,
+  .control-btn,
+  .subject-card {
+    transition: none !important;
+  }
+  
+  .subject-card.status-danger {
+    animation: none !important;
+  }
+}
