@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amrita AttendEase</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 400px;
+            min-height: 500px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+
+        .popup-container {
+            padding: 0;
+            background: white;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .status-section {
+            margin-bottom: 20px;
+        }
+
+        .overall-status {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .status-indicator {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .status-text {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .status-safe { color: #28a745; }
+        .status-warning { color: #ffc107; }
+        .status-danger { color: #dc3545; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .subjects-section h3 {
+            font-size: 14px;
+            margin-bottom: 12px;
+            color: #333;
+        }
+
+        .subject-list {
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .subject-item {
+            background: #fafafa;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-left: 4px solid #ddd;
+        }
+
+        .subject-item.safe { border-left-color: #28a745; }
+        .subject-item.warning { border-left-color: #ffc107; }
+        .subject-item.danger { border-left-color: #dc3545; }
+
+        .subject-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .subject-info {
+            flex: 1;
+        }
+
+        .subject-code {
+            font-weight: 600;
+            font-size: 12px;
+            color: #333;
+        }
+
+        .subject-name {
+            font-size: 11px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .subject-percentage {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .subject-message {
+            font-size: 11px;
+            color: #555;
+            background: rgba(0,0,0,0.05);
+            padding: 6px;
+            border-radius: 4px;
+            margin-top: 6px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            text-align: center;
+            padding: 30px 20px;
+            color: #dc3545;
+        }
+
+        .error p {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .error small {
+            font-size: 12px;
+            color: #666;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        .actions {
+            padding: 15px 20px;
+            border-top: 1px solid #e9ecef;
+            background: #f8f9fa;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn:last-child {
+            margin-bottom: 0;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        /* Scrollbar styling */
+        .subject-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .subject-list::-webkit-scrollbar-track {
+            background: #f1f3f4;
+        }
+
+        .subject-list::-webkit-scrollbar-thumb {
+            background: #c1c8cd;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="popup-container">
+        <div class="header">
+            <h1>🎯 Amrita AttendEase</h1>
+            <p>Smart Attendance Tracker</p>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="loading-spinner"></div>
+            <p>Loading attendance data...</p>
+        </div>
+
+        <div id="error" class="error" style="display: none;">
+            <div style="margin-bottom: 15px;">
+                <p>⚠️ Please visit the attendance page first</p>
+                <small>You need to be on the attendance page to use this extension</small>
+            </div>
+            <button id="go-to-attendance" class="btn btn-primary" style="margin-bottom: 10px;">
+                📊 Go to Attendance Page
+            </button>
+            <div style="font-size: 11px; color: #666; line-height: 1.4;">
+                <strong>Quick Guide:</strong><br>
+                1. Click the button above<br>
+                2. Login to your student portal<br>
+                3. Navigate to attendance section<br>
+                4. Click the extension again
+            </div>
+        </div>
+
+        <div id="content" class="content" style="display: none;">
+            <div class="status-section">
+                <div class="overall-status">
+                    <div id="status-indicator" class="status-indicator">✅</div>
+                    <div id="status-text" class="status-text">All Good!</div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div id="safe-count" class="stat-number">0</div>
+                        <div class="stat-label">Safe Subjects</div>
+                    </div>
+                    <div class="stat-card">
+                        <div id="total-subjects" class="stat-number">0</div>
+                        <div class="stat-label">Total Subjects</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subjects-section">
+                <h3>📚 Subject Details</h3>
+                <div id="subject-list" class="subject-list"></div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button id="toggle-widget" class="btn btn-primary">Toggle Widget</button>
+            <button id="refresh-data" class="btn btn-secondary">Refresh Data</button>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
