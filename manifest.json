@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Amrita AttendEase",
+  "version": "1.0.0",
+  "description": "Smart attendance tracker for Amrita students - calculate how many classes you can bunk while maintaining 75% attendance",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://students.amrita.edu/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://students.amrita.edu/client/class-attendance*"],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Amrita AttendEase"
+  }
+}
