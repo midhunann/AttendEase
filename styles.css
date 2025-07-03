@@ -4,11 +4,11 @@
   position: fixed !important;
   top: 20px !important;
   right: 20px !important;
-  width: 380px !important;
+  width: 420px !important;
   max-height: 80vh !important;
   background: #ffffff !important;
-  border-radius: 12px !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25) !important;
   z-index: 999999 !important;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important;
   font-size: 14px !important;
@@ -17,6 +17,7 @@
   overflow: hidden !important;
   transition: all 0.3s ease !important;
   transform: translate3d(0, 0, 0) !important;
+  backdrop-filter: blur(10px) !important;
 }
 
 .amrita-widget.hidden {
@@ -36,7 +37,7 @@
 
 /* Widget Header */
 .widget-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  background: linear-gradient(135deg, #bf0d4f 0%, #bf0d4f 100%) !important;
   color: white !important;
   padding: 12px 16px !important;
   display: flex !important;
@@ -150,162 +151,270 @@
 
 /* Subject Cards */
 .subject-card {
-  border-radius: 8px !important;
-  padding: 12px !important;
+  border-radius: 12px !important;
+  padding: 8px 8px 0 8px !important;
   border-left: 4px solid #ddd !important;
   background: #fafafa !important;
   transition: all 0.2s ease !important;
+  margin-bottom: 8px !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* L-shaped connection between left border and bottom progress bar */
+.subject-card::before {
+  content: '' !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 4px !important;
+  height: 6px !important;
+  background: inherit !important;
+  z-index: 2 !important;
 }
 
 .subject-card:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  transform: translateY(-2px) !important;
 }
 
 .subject-card.status-safe {
   border-left-color: #28a745 !important;
-  background: #f8fff9 !important;
+  background: linear-gradient(135deg, #f8fff9 0%, #e8f5e8 100%) !important;
+}
+
+.subject-card.status-safe::before {
+  background: #28a745 !important;
 }
 
 .subject-card.status-warning {
   border-left-color: #ffc107 !important;
-  background: #fffef8 !important;
+  background: linear-gradient(135deg, #fffef8 0%, #fff8e1 100%) !important;
+}
+
+.subject-card.status-warning::before {
+  background: #ffc107 !important;
 }
 
 .subject-card.status-danger {
   border-left-color: #dc3545 !important;
-  background: #fff8f8 !important;
+  background: linear-gradient(135deg, #fff8f8 0%, #ffebee 100%) !important;
 }
 
-/* Subject Header */
-.subject-header {
+.subject-card.status-danger::before {
+  background: #dc3545 !important;
+}
+
+/* Updated Subject Card Styles */
+.subject-card-content {
   display: flex !important;
   justify-content: space-between !important;
-  align-items: flex-start !important;
+  align-items: center !important;
+  gap: 8px !important;
   margin-bottom: 8px !important;
 }
 
-.subject-info {
+.subject-left {
   flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
 }
 
-.course-code {
+.subject-right {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 70px !important;
+  min-height: 50px !important;
+  background: rgba(255,255,255,0.8) !important;
+  border-radius: 6px !important;
+  padding: 6px !important;
+}
+
+/* Progress Bottom Border */
+.progress-bottom-border {
+  position: relative !important;
+  height: 6px !important;
+  background: rgba(0,0,0,0.1) !important;
+  border-radius: 0 0 12px 12px !important;
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.progress-fill {
+  height: 100% !important;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+}
+
+.progress-target {
+  position: absolute !important;
+  left: 75% !important;
+  top: 0 !important;
+  width: 1px !important;
+  height: 100% !important;
+  background: rgba(255,255,255,0.8) !important;
+  z-index: 2 !important;
+}
+
+.progress-target::after {
+  content: '75%' !important;
+  position: absolute !important;
+  top: -16px !important;
+  left: -8px !important;
+  font-size: 8px !important;
+  color: #666 !important;
   font-weight: 600 !important;
+  background: rgba(255,255,255,0.9) !important;
+  padding: 1px 3px !important;
+  border-radius: 2px !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+  white-space: nowrap !important;
+}
+
+.attendance-percentage-text {
+  position: absolute !important;
+  right: 4px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  font-weight: 800 !important;
+  font-size: 11px !important;
+  color: #ffffff !important;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5) !important;
+  z-index: 3 !important;
+  background: rgba(0,0,0,0.3) !important;
+  padding: 2px 4px !important;
+  border-radius: 3px !important;
+  backdrop-filter: blur(2px) !important;
+  line-height: 1 !important;
+  min-width: 24px !important;
+  text-align: center !important;
+}
+
+/* Color variations for progress bottom border */
+.progress-fill.safe { 
+  background: linear-gradient(90deg, #28a745, #20c997) !important; 
+}
+.progress-fill.warning { 
+  background: linear-gradient(90deg, #ffc107, #fd7e14) !important; 
+}
+.progress-fill.danger { 
+  background: linear-gradient(90deg, #dc3545, #e91e63) !important; 
+}
+
+.bunk-section {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100% !important;
+  min-height: 50px !important;
+  width: 100% !important;
+  border-radius: 6px !important;
+  background: rgba(255,255,255,0.9) !important;
+  transition: all 0.2s ease !important;
+}
+
+.bunk-section:hover {
+  transform: translateY(-1px) !important;
+  /* box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important; */
+}
+
+.bunk-text-top {
+  font-size: 8px !important;
+  font-weight: 600 !important;
+  color: #666 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.3px !important;
+  margin-bottom: 2px !important;
+}
+
+.bunk-number {
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  color: #333 !important;
+  line-height: 1 !important;
+  margin: 1px 0 !important;
+}
+
+.bunk-text-bottom {
+  font-size: 8px !important;
+  color: #666 !important;
+  font-weight: 600 !important;
+  margin-top: 2px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.3px !important;
+}
+
+.danger-message {
+  background: rgba(220, 53, 69, 0.1) !important;
+  border: 1px solid rgba(220, 53, 69, 0.3) !important;
+  border-radius: 6px !important;
+  padding: 4px !important;
+  color: #721c24 !important;
+  font-size: 8px !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+  line-height: 1.2 !important;
+}
+
+/* Course Code and Name Styles */
+.course-code {
+  font-weight: 700 !important;
   font-size: 13px !important;
   color: #333 !important;
   margin-bottom: 2px !important;
 }
 
 .course-name {
-  font-size: 12px !important;
-  color: #666 !important;
-  line-height: 1.3 !important;
-}
-
-.attendance-percentage {
-  font-weight: 700 !important;
-  font-size: 18px !important;
-  padding: 4px 8px !important;
-  border-radius: 20px !important;
-  background: #f0f0f0 !important;
-}
-
-.attendance-percentage.safe {
-  background: #d4edda !important;
-  color: #155724 !important;
-}
-
-.attendance-percentage.warning {
-  background: #fff3cd !important;
-  color: #856404 !important;
-}
-
-.attendance-percentage.danger {
-  background: #f8d7da !important;
-  color: #721c24 !important;
-}
-
-/* Progress Bar */
-.progress-bar {
-  position: relative !important;
-  height: 6px !important;
-  background: #e9ecef !important;
-  border-radius: 3px !important;
-  margin: 8px 0 !important;
-  overflow: hidden !important;
-}
-
-.progress-fill {
-  height: 100% !important;
-  background: linear-gradient(90deg, #dc3545 0%, #ffc107 60%, #28a745 80%) !important;
-  border-radius: 3px !important;
-  transition: width 0.3s ease !important;
-}
-
-.progress-target {
-  position: absolute !important;
-  top: -2px !important;
-  width: 2px !important;
-  height: 10px !important;
-  background: #333 !important;
-  border-radius: 1px !important;
-}
-
-.progress-target::before {
-  content: '75%' !important;
-  position: absolute !important;
-  top: -18px !important;
-  left: -8px !important;
   font-size: 10px !important;
   color: #666 !important;
+  line-height: 1.2 !important;
+  margin-bottom: 2px !important;
+}
+
+.attendance-fraction {
+  font-weight: 600 !important;
+  font-size: 11px !important;
+  color: #555 !important;
+  margin-bottom: 1px !important;
+}
+
+.absent-count {
+  font-size: 9px !important;
+  color: #888 !important;
   font-weight: 500 !important;
 }
 
-/* Subject Stats */
-.subject-stats {
-  display: flex !important;
-  justify-content: space-between !important;
-  margin: 8px 0 !important;
-}
-
-.stat {
-  text-align: center !important;
-  flex: 1 !important;
-}
-
-.stat-number {
-  display: block !important;
-  font-weight: 600 !important;
-  font-size: 14px !important;
-  color: #333 !important;
-}
-
-.stat-text {
-  font-size: 11px !important;
-  color: #666 !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.5px !important;
-}
-
-/* Calculation Result */
-.calculation-result {
-  background: rgba(0, 0, 0, 0.05) !important;
-  border-radius: 6px !important;
-  padding: 8px !important;
+/* Legacy attendance percentage styles - keeping for compatibility */
+.attendance-percentage {
+  font-weight: 700 !important;
+  font-size: 24px !important;
+  color: white !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
+  border-radius: 8px !important;
   display: flex !important;
   align-items: center !important;
-  gap: 8px !important;
-  margin-top: 8px !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 80px !important;
+  min-width: 90px !important;
 }
 
-.calculation-icon {
-  font-size: 16px !important;
+.attendance-percentage.safe { 
+  background: linear-gradient(135deg, #28a745, #20c997) !important; 
 }
-
-.calculation-text {
-  font-size: 12px !important;
-  color: #333 !important;
-  font-weight: 500 !important;
-  flex: 1 !important;
+.attendance-percentage.warning { 
+  background: linear-gradient(135deg, #ffc107, #ff8c00) !important; 
+}
+.attendance-percentage.danger { 
+  background: linear-gradient(135deg, #dc3545, #e91e63) !important; 
 }
 
 /* Responsive Design */
@@ -369,9 +478,5 @@
   .control-btn,
   .subject-card {
     transition: none !important;
-  }
-  
-  .subject-card.status-danger {
-    animation: none !important;
   }
 }
