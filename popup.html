@@ -12,7 +12,7 @@
         }
 
         body {
-            width: 400px;
+            width: 420px;
             min-height: 500px;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -51,21 +51,24 @@
         }
 
         .overall-status {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            padding: 20px;
             text-align: center;
             margin-bottom: 15px;
+            border: 1px solid rgba(0,0,0,0.1);
         }
 
         .status-indicator {
-            font-size: 24px;
+            font-size: 32px;
             margin-bottom: 8px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
         }
 
         .status-text {
-            font-weight: 600;
-            font-size: 16px;
+            font-weight: 700;
+            font-size: 18px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
 
         .status-safe { color: #28a745; }
@@ -80,22 +83,33 @@
         }
 
         .stat-card {
-            background: #f8f9fa;
-            border-radius: 6px;
-            padding: 12px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 12px;
+            padding: 16px;
             text-align: center;
+            border: 1px solid rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         .stat-number {
-            font-size: 24px;
-            font-weight: 700;
+            font-size: 28px;
+            font-weight: 800;
             color: #333;
+            line-height: 1;
+            margin-bottom: 4px;
         }
 
         .stat-label {
             font-size: 12px;
             color: #666;
-            margin-top: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .subjects-section h3 {
@@ -109,53 +123,291 @@
             overflow-y: auto;
         }
 
-        .subject-item {
+        .subject-card {
             background: #fafafa;
-            border-radius: 6px;
-            padding: 12px;
-            margin-bottom: 8px;
+            border-radius: 12px;
+            padding: 12px 12px 0 12px;
+            margin-bottom: 12px;
             border-left: 4px solid #ddd;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
         }
 
-        .subject-item.safe { border-left-color: #28a745; }
-        .subject-item.warning { border-left-color: #ffc107; }
-        .subject-item.danger { border-left-color: #dc3545; }
+        /* L-shaped connection between left border and progress bar */
+        .subject-card::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 4px;
+            height: 6px;
+            background: inherit;
+            z-index: 2;
+        }
 
-        .subject-header {
+        .subject-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+
+        .subject-card.safe { 
+            border-left-color: #28a745; 
+            background: linear-gradient(135deg, #f8fff9 0%, #e8f5e8 100%);
+        }
+        .subject-card.safe::before {
+            background: #28a745;
+        }
+        .subject-card.warning { 
+            border-left-color: #ffc107; 
+            background: linear-gradient(135deg, #fffef8 0%, #fff8e1 100%);
+        }
+        .subject-card.warning::before {
+            background: #ffc107;
+        }
+        .subject-card.danger { 
+            border-left-color: #dc3545; 
+            background: linear-gradient(135deg, #fff8f8 0%, #ffebee 100%);
+        }
+        .subject-card.danger::before {
+            background: #dc3545;
+        }
+
+        .subject-card-content {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 8px;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
         }
 
-        .subject-info {
+        /* Progress Bottom Border */
+        .progress-bottom-border {
+            height: 6px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 0 0 12px 12px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .progress-fill {
+            height: 100%;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .progress-fill.safe { 
+            background: linear-gradient(90deg, #28a745, #20c997); 
+        }
+        .progress-fill.warning { 
+            background: linear-gradient(90deg, #ffc107, #fd7e14); 
+        }
+        .progress-fill.danger { 
+            background: linear-gradient(90deg, #dc3545, #e91e63); 
+        }
+
+        .progress-target {
+            position: absolute;
+            left: 75%;
+            top: 0;
+            width: 1px;
+            height: 100%;
+            background: rgba(255,255,255,0.8);
+            z-index: 2;
+        }
+
+        .progress-target::after {
+            content: '75%';
+            position: absolute;
+            top: -16px;
+            left: -8px;
+            font-size: 8px;
+            color: #666;
+            font-weight: 600;
+            background: rgba(255,255,255,0.9);
+            padding: 1px 3px;
+            border-radius: 2px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            white-space: nowrap;
+        }
+
+        .attendance-percentage-text {
+            position: absolute;
+            right: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: 800;
+            font-size: 11px;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            z-index: 3;
+            background: rgba(0,0,0,0.3);
+            padding: 2px 4px;
+            border-radius: 3px;
+            backdrop-filter: blur(2px);
+            line-height: 1;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .subject-left {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .subject-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 90px;
+            min-height: 60px;
+        }
+
+        .subject-right {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 80px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 8px;
+            padding: 8px;
         }
 
         .subject-code {
-            font-weight: 600;
-            font-size: 12px;
+            font-weight: 700;
+            font-size: 14px;
             color: #333;
+            margin-bottom: 2px;
         }
 
         .subject-name {
             font-size: 11px;
             color: #666;
-            margin-top: 2px;
+            line-height: 1.2;
+            margin-bottom: 3px;
         }
 
-        .subject-percentage {
-            font-weight: 700;
-            font-size: 14px;
-        }
-
-        .subject-message {
-            font-size: 11px;
+        .attendance-fraction {
+            font-weight: 600;
+            font-size: 12px;
             color: #555;
-            background: rgba(0,0,0,0.05);
+            margin-bottom: 1px;
+        }
+
+        .absent-count {
+            font-size: 10px;
+            color: #888;
+            font-weight: 500;
+        }
+
+        .attendance-percentage {
+            font-weight: 700;
+            font-size: 24px;
+            padding: 8px 12px;
+            border-radius: 16px;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .attendance-percentage.safe { background: linear-gradient(135deg, #28a745, #20c997); }
+        .attendance-percentage.warning { background: linear-gradient(135deg, #ffc107, #ff8c00); }
+        .attendance-percentage.danger { background: linear-gradient(135deg, #dc3545, #e91e63); }
+
+        .bunk-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            min-height: 50px;
+        }
+
+        .bunk-text-top {
+            font-size: 9px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .bunk-number {
+            font-size: 28px;
+            font-weight: 900;
+            color: #333;
+            line-height: 1;
+            margin: 2px 0;
+        }
+
+        .bunk-text-bottom {
+            font-size: 9px;
+            color: #666;
+            font-weight: 600;
+            margin-top: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .danger-message {
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            border-radius: 6px;
+            padding: 4px;
+            color: #721c24;
+            font-size: 8px;
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .bunk-section {
+            background: rgba(255,255,255,0.7);
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .bunk-number {
+            font-size: 24px;
+            font-weight: 900;
+            color: #333;
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+
+        .bunk-text {
+            font-size: 10px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .bunk-classes {
+            font-size: 9px;
+            color: #888;
+            margin-top: 1px;
+        }
+
+        .danger-message {
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            border-radius: 6px;
             padding: 6px;
-            border-radius: 4px;
-            margin-top: 6px;
+            color: #721c24;
+            font-size: 10px;
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.2;
         }
 
         .loading {
@@ -199,34 +451,45 @@
         }
 
         .actions {
-            padding: 15px 20px;
+            padding: 20px;
             border-top: 1px solid #e9ecef;
-            background: #f8f9fa;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         }
 
         .btn {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-size: 14px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
         }
 
         .btn-secondary {
-            background: #6c757d;
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
             color: white;
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
         }
 
-        .btn:hover {
-            opacity: 0.9;
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(108, 117, 125, 0.5);
         }
 
         .btn:last-child {
