@@ -308,6 +308,43 @@ class AmritaAttendanceTracker {
     return 'danger';
   }
 
+  getBunkContent(subject) {
+    if (subject.status === 'safe' && subject.calculations.canBunk > 0) {
+      return `
+        <div class="bunk-section">
+          <div class="bunk-text-top">Go Bunk</div>
+          <div class="bunk-number">${subject.calculations.canBunk}</div>
+          <div class="bunk-text-bottom">classes</div>
+        </div>
+      `;
+    } else if (subject.status === 'danger') {
+      return `
+        <div class="bunk-section">
+          <div class="bunk-text-top">Attend</div>
+          <div class="bunk-number">${subject.calculations.needToAttend}</div>
+          <div class="bunk-text-bottom">classes</div>
+        </div>
+      `;
+    } else if (subject.status === 'warning' || (subject.status === 'safe' && subject.calculations.canBunk === 0)) {
+      return `
+        <div class="bunk-section">
+          <div class="bunk-text-top">Can Bunk</div>
+          <div class="bunk-number">0</div>
+          <div class="bunk-text-bottom">classes</div>
+        </div>
+      `;
+    } else {
+      // Fallback for any edge cases
+      return `
+        <div class="bunk-section">
+          <div class="bunk-text-top">Go Bunk</div>
+          <div class="bunk-number">${subject.calculations.canBunk || 0}</div>
+          <div class="bunk-text-bottom">classes</div>
+        </div>
+      `;
+    }
+  }
+
   createFloatingWidget() {
     // Remove existing widget if any
     if (this.widget) {
@@ -346,44 +383,30 @@ class AmritaAttendanceTracker {
         </div>
 
         <div class="subjects-list">
-          ${this.tableData.map(subject => `
-            <div class="subject-card status-${subject.status}">
-              <div class="subject-header">
-                <div class="subject-info">
-                  <div class="course-code">${subject.courseCode}</div>
-                  <div class="course-name">${subject.courseName}</div>
+          ${this.tableData.map(subject => {
+            const bunkContent = this.getBunkContent(subject);
+            
+            return `
+              <div class="subject-card status-${subject.status}">
+                <div class="subject-card-content">
+                  <div class="subject-left">
+                    <div class="course-code">${subject.courseCode}</div>
+                    <div class="course-name">${subject.courseName}</div>
+                    <div class="attendance-fraction">${subject.present}/${subject.total}</div>
+                    <div class="absent-count">${subject.absent} absent</div>
+                  </div>
+                  <div class="subject-right">
+                    ${bunkContent}
+                  </div>
                 </div>
-                <div class="attendance-percentage ${subject.status}">
-                  ${subject.percentage.toFixed(1)}%
-                </div>
-              </div>
-              
-              <div class="progress-bar">
-                <div class="progress-fill" style="width: ${Math.min(subject.percentage, 100)}%"></div>
-                <div class="progress-target" style="left: 75%"></div>
-              </div>
-              
-              <div class="subject-stats">
-                <div class="stat">
-                  <span class="stat-number">${subject.present}</span>
-                  <span class="stat-text">Present</span>
-                </div>
-                <div class="stat">
-                  <span class="stat-number">${subject.total}</span>
-                  <span class="stat-text">Total</span>
-                </div>
-                <div class="stat">
-                  <span class="stat-number">${subject.absent}</span>
-                  <span class="stat-text">Absent</span>
+                <div class="progress-bottom-border">
+                  <div class="progress-fill ${subject.status}" style="width: ${Math.min(subject.percentage, 100)}%"></div>
+                  <div class="progress-target"></div>
+                  <div class="attendance-percentage-text ${subject.status}">${subject.percentage.toFixed(1)}%</div>
                 </div>
               </div>
-              
-              <div class="calculation-result">
-                <span class="calculation-icon">${subject.status === 'safe' ? '✅' : subject.status === 'warning' ? '⚠️' : '🚨'}</span>
-                <span class="calculation-text">${subject.calculations.message}</span>
-              </div>
-            </div>
-          `).join('')}
+            `;
+          }).join('')}
         </div>
       </div>
     `;
