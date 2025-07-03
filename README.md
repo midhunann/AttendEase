@@ -1,6 +1,21 @@
-# 🎯 Amrita AttendEase - Quick Start
+# 🎯 Amrita AttendEase - Enhanced UI/UX
 
-A simple Chrome extension to track your Amrita attendance and calculate bunking possibilities.
+A modern Chrome extension to track your Amrita attendance with beautiful, intuitive design and smart bunking calculations.
+
+## 🚀 New Features (v1.1)
+
+### ✨ Enhanced UI/UX
+- **Modern Card Design**: Revamped subject cards with gradient backgrounds and hover effects
+- **Improved Layout**: Course info on the left, attendance percentage on the right
+- **Smart Bunk Display**: Large, prominent "Go Bunk X classes" feature
+- **Visual Progress Bars**: Color-coded attendance bars with 75% target line
+- **Better Typography**: Improved fonts, spacing, and readability
+
+### 🎨 Design Improvements
+- **Gradient Backgrounds**: Beautiful gradients for status indicators
+- **Enhanced Shadows**: Subtle shadows and depth for better visual hierarchy
+- **Responsive Design**: Better spacing and layout for different screen sizes
+- **Color-Coded Status**: Green (Safe), Orange (Warning), Red (Danger)
 
 ## ⚡ Quick Installation
 
