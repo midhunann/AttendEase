@@ -121,7 +121,7 @@ class PopupManager {
   }
 
   getBunkContent(subject) {
-    if (subject.status === 'safe' && subject.calculations.canBunk > 0) {
+    if (subject.calculations.canBunk > 0) {
       return `
         <div class="bunk-section">
           <div class="bunk-text-top">Go Bunk</div>
@@ -137,20 +137,11 @@ class PopupManager {
           <div class="bunk-text-bottom">classes</div>
         </div>
       `;
-    } else if (subject.status === 'warning' || (subject.status === 'safe' && subject.calculations.canBunk === 0)) {
+    } else {
       return `
         <div class="bunk-section">
           <div class="bunk-text-top">Can Bunk</div>
           <div class="bunk-number">0</div>
-          <div class="bunk-text-bottom">classes</div>
-        </div>
-      `;
-    } else {
-      // Fallback for any edge cases
-      return `
-        <div class="bunk-section">
-          <div class="bunk-text-top">Go Bunk</div>
-          <div class="bunk-number">${subject.calculations.canBunk || 0}</div>
           <div class="bunk-text-bottom">classes</div>
         </div>
       `;

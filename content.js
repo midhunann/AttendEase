@@ -17,11 +17,6 @@ class AmritaAttendanceTracker {
     console.log('[AttendEase] Content script initializing...');
     console.log('[AttendEase] Current URL:', window.location.href);
     
-    // Run algorithm tests in development
-    if (window.location.href.includes('localhost') || window.location.href.includes('dev')) {
-      this.testCalculations();
-    }
-    
     // Start with immediate check
     this.startTableDetection();
     
@@ -276,14 +271,11 @@ class AmritaAttendanceTracker {
     const results = {};
     const effectivePresent = present + dutyLeave; // Include duty leave in attendance
 
-    console.log(`[AttendEase] Calculating scenarios for: Total=${total}, Present=${present}, DutyLeave=${dutyLeave}, CurrentPercentage=${currentPercentage.toFixed(1)}%`);
-
     // Safety check for edge cases
     if (total <= 0) {
       results.canBunk = 0;
       results.needToAttend = 0;
       results.message = 'No classes recorded';
-      console.log(`[AttendEase] Edge case: Zero total classes`);
       return results;
     }
 
@@ -298,27 +290,15 @@ class AmritaAttendanceTracker {
 
     // Recalculate percentage to ensure accuracy
     const actualPercentage = (effectivePresent / total) * 100;
-    console.log(`[AttendEase] Actual percentage: ${actualPercentage.toFixed(1)}% (input was ${currentPercentage.toFixed(1)}%)`);
 
     if (actualPercentage >= this.MIN_ATTENDANCE) {
       // Calculate how many classes can be bunked while maintaining 75%
       let canBunk = 0;
-      let futureTotal = total;
-      let futureEffectivePresent = effectivePresent;
-
-      console.log(`[AttendEase] Safe zone calculation: Starting with ${futureEffectivePresent}/${futureTotal} = ${actualPercentage.toFixed(1)}%`);
-
-      // Use mathematical approach for better accuracy
-      // Formula: (effectivePresent / (total + bunked)) >= 0.75
-      // Solving: effectivePresent >= 0.75 * (total + bunked)
-      // bunked <= (effectivePresent / 0.75) - total
-      const maxBunkMath = Math.floor((effectivePresent / (this.MIN_ATTENDANCE / 100)) - total);
-      console.log(`[AttendEase] Mathematical max bunk: ${maxBunkMath}`);
-
-      // Use iterative approach for validation
-      while (canBunk < maxBunkMath && canBunk < 1000) {
-        futureTotal++; // One more class added
-        const newPercentage = (futureEffectivePresent / futureTotal) * 100;
+      let testTotal = total;
+      
+      while (canBunk < 1000) { // Safety limit
+        testTotal++; // Test bunking one more class
+        const newPercentage = (effectivePresent / testTotal) * 100;
         
         if (newPercentage >= this.MIN_ATTENDANCE) {
           canBunk++;
@@ -327,43 +307,29 @@ class AmritaAttendanceTracker {
         }
       }
 
-      // Use the more conservative result
-      results.canBunk = Math.min(canBunk, maxBunkMath, 1000);
+      results.canBunk = Math.max(0, canBunk);
       results.message = results.canBunk > 0 
         ? `You can bunk ${results.canBunk} more classes and stay ≥75%`
         : 'Cannot bunk any more classes';
-      
-      console.log(`[AttendEase] Final result: Can bunk ${results.canBunk} classes`);
     } else {
       // Calculate how many classes needed to reach 75%
       let needToAttend = 0;
       let futureTotal = total;
       let futureEffectivePresent = effectivePresent;
 
-      console.log(`[AttendEase] Danger zone calculation: Starting with ${futureEffectivePresent}/${futureTotal} = ${actualPercentage.toFixed(1)}%`);
-
       // Use mathematical approach for better accuracy
-      // Formula: (effectivePresent + attend) / (total + attend) >= 0.75
-      // Solving: effectivePresent + attend >= 0.75 * (total + attend)
-      // attend >= (0.75 * total - effectivePresent) / 0.25
       const minAttendMath = Math.ceil((this.MIN_ATTENDANCE / 100 * total - effectivePresent) / (1 - this.MIN_ATTENDANCE / 100));
-      console.log(`[AttendEase] Mathematical min attend: ${minAttendMath}`);
 
       // Use iterative approach for validation
       while ((futureEffectivePresent / futureTotal) * 100 < this.MIN_ATTENDANCE && needToAttend < 1000) {
         futureTotal++;
         futureEffectivePresent++; // Attending increases effective present
         needToAttend++;
-        
-        const newPercentage = (futureEffectivePresent / futureTotal) * 100;
-        console.log(`[AttendEase] After attending ${needToAttend} classes: ${futureEffectivePresent}/${futureTotal} = ${newPercentage.toFixed(1)}%`);
       }
 
       // Use the more conservative result
       results.needToAttend = Math.max(needToAttend, minAttendMath, 0);
       results.message = `Attend ${results.needToAttend} consecutive classes to reach 75%`;
-      
-      console.log(`[AttendEase] Final result: Need to attend ${results.needToAttend} classes`);
     }
 
     // Additional safety checks
@@ -373,30 +339,6 @@ class AmritaAttendanceTracker {
     return results;
   }
 
-  // Test function for validating the algorithm
-  testCalculations() {
-    console.log('[AttendEase] Testing calculation algorithm...');
-    
-    const testCases = [
-      { total: 10, present: 8, dutyLeave: 0, expected: 'safe' },      // 80% - should be safe
-      { total: 10, present: 7, dutyLeave: 1, expected: 'safe' },     // 80% with duty leave
-      { total: 10, present: 7, dutyLeave: 0, expected: 'danger' },   // 70% - should be danger
-      { total: 10, present: 7, dutyLeave: 1, expected: 'safe' },     // 80% with duty leave
-      { total: 20, present: 15, dutyLeave: 0, expected: 'safe' },    // 75% - should be warning
-      { total: 4, present: 3, dutyLeave: 0, expected: 'safe' },      // 75% exactly
-      { total: 1, present: 1, dutyLeave: 0, expected: 'safe' },      // 100% - edge case
-      { total: 100, present: 90, dutyLeave: 0, expected: 'safe' },   // 90% - high attendance
-    ];
-
-    testCases.forEach((test, index) => {
-      const percentage = ((test.present + test.dutyLeave) / test.total) * 100;
-      const result = this.calculateScenarios(test.total, test.present, test.dutyLeave, percentage);
-      const status = this.getStatus(percentage);
-      
-      console.log(`[AttendEase] Test ${index + 1}: ${test.present}+${test.dutyLeave}/${test.total} = ${percentage.toFixed(1)}%, Status: ${status}, CanBunk: ${result.canBunk}, NeedToAttend: ${result.needToAttend}`);
-    });
-  }
-
   getStatus(percentage) {
     if (percentage >= 80) return 'safe';
     if (percentage >= 75) return 'warning';
@@ -404,7 +346,7 @@ class AmritaAttendanceTracker {
   }
 
   getBunkContent(subject) {
-    if (subject.status === 'safe' && subject.calculations.canBunk > 0) {
+    if (subject.calculations.canBunk > 0) {
       return `
         <div class="bunk-section">
           <div class="bunk-text-top">Go Bunk</div>
@@ -420,20 +362,11 @@ class AmritaAttendanceTracker {
           <div class="bunk-text-bottom">classes</div>
         </div>
       `;
-    } else if (subject.status === 'warning' || (subject.status === 'safe' && subject.calculations.canBunk === 0)) {
+    } else {
       return `
         <div class="bunk-section">
           <div class="bunk-text-top">Can Bunk</div>
           <div class="bunk-number">0</div>
-          <div class="bunk-text-bottom">classes</div>
-        </div>
-      `;
-    } else {
-      // Fallback for any edge cases
-      return `
-        <div class="bunk-section">
-          <div class="bunk-text-top">Go Bunk</div>
-          <div class="bunk-number">${subject.calculations.canBunk || 0}</div>
           <div class="bunk-text-bottom">classes</div>
         </div>
       `;
