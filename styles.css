@@ -35,6 +35,16 @@
   display: none !important;
 }
 
+/* Dragging states */
+.amrita-widget.dragging {
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4) !important;
+  transform-origin: center !important;
+}
+
+.amrita-widget.dragging .widget-header {
+  cursor: grabbing !important;
+}
+
 /* Widget Header */
 .widget-header {
   background: linear-gradient(135deg, #bf0d4f 0%, #bf0d4f 100%) !important;
@@ -52,11 +62,12 @@
   align-items: center !important;
   font-weight: 600 !important;
   font-size: 16px !important;
+  gap: 8px !important;
 }
 
 .widget-icon {
-  margin-right: 8px !important;
-  font-size: 18px !important;
+  font-weight: 700 !important;
+  font-size: 16px !important;
 }
 
 .widget-controls {
