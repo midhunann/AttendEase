@@ -19,8 +19,18 @@
       "run_at": "document_end"
     }
   ],
+  "icons": {
+    "16": "attend-ease-16.png",
+    "48": "attend-ease-48.png",
+    "128": "attend-ease-128.png"
+  },
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Amrita AttendEase"
+    "default_title": "Amrita AttendEase",
+    "default_icon": {
+      "16": "attend-ease-16.png",
+      "48": "attend-ease-48.png",
+      "128": "attend-ease-128.png"
+    }
   }
 }
