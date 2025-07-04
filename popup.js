@@ -101,7 +101,7 @@ class PopupManager {
         <div class="subject-card ${subject.status}">
           <div class="subject-card-content">
             <div class="subject-left">
-              <div class="subject-code">${subject.courseCode}</div>
+              <div class="subject-code">${subject.serialNumber} | ${subject.courseCode}</div>
               <div class="subject-name">${subject.courseName}</div>
               <div class="attendance-fraction">${subject.dutyLeave > 0 ? `${subject.present}+${subject.dutyLeave}` : subject.present}/${subject.total}</div>
               <div class="absent-count">${subject.absent} absent</div>

@@ -245,6 +245,7 @@ class AmritaAttendanceTracker {
       
       const subjectData = {
         id: index,
+        serialNumber: slNo,
         courseCode: courseCode.substring(0, 20), // Limit length
         courseName: courseName.substring(0, 50),
         className,
@@ -383,7 +384,7 @@ class AmritaAttendanceTracker {
               <div class="subject-card status-${subject.status}">
                 <div class="subject-card-content">
                   <div class="subject-left">
-                    <div class="course-code">${subject.courseCode}</div>
+                    <div class="course-code">${subject.serialNumber} | ${subject.courseCode}</div>
                     <div class="course-name">${subject.courseName}</div>
                     <div class="attendance-fraction">${subject.dutyLeave > 0 ? `${subject.present}+${subject.dutyLeave}` : subject.present}/${subject.total}</div>
                     <div class="absent-count">${subject.absent} absent</div>
