@@ -1,62 +1,171 @@
-# 🎯 Amrita AttendEase - Enhanced UI/UX
+# ![AttendEase Logo](attend-ease-48.png) AttendEase 
+Maximize your bunks! Skip as many classes as possible while maintaining at least 75% attendance.
 
-A modern Chrome extension to track your Amrita attendance with beautiful, intuitive design and smart bunking calculations.
 
-## 🚀 New Features (v1.1)
 
-### ✨ Enhanced UI/UX
-- **Modern Card Design**: Revamped subject cards with gradient backgrounds and hover effects
-- **Improved Layout**: Course info on the left, attendance percentage on the right
-- **Smart Bunk Display**: Large, prominent "Go Bunk X classes" feature
-- **Visual Progress Bars**: Color-coded attendance bars with 75% target line
-- **Better Typography**: Improved fonts, spacing, and readability
+[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/midhunann/amrita-attendease)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](/LICENSE)
+[![Chrome Web Store – Not Published](https://img.shields.io/badge/Chrome%20Web%20Store-Not%20Published-lightgrey?logo=googlechrome)](#)
+[![Firefox Add‑on – Not Published](https://img.shields.io/badge/Firefox%20Add--on-Not%20Published-lightgrey?logo=firefox)](#)
+[![Edge Add‑on – Not Published](https://img.shields.io/badge/Edge%20Add--on-Not%20Published-lightgrey?logo=microsoftedge)](#)
 
-### 🎨 Design Improvements
-- **Gradient Backgrounds**: Beautiful gradients for status indicators
-- **Enhanced Shadows**: Subtle shadows and depth for better visual hierarchy
-- **Responsive Design**: Better spacing and layout for different screen sizes
-- **Color-Coded Status**: Green (Safe), Orange (Warning), Red (Danger)
-
-## ⚡ Quick Installation
-
-1. **Open Chrome** → Go to `chrome://extensions/`
-2. **Enable Developer Mode** (toggle top-right)
-3. **Click "Load unpacked"** → Select this folder
-4. **Done!** Extension is ready to use
-
-## � How to Use
-
-1. **Login** to your Amrita portal: `https://my.amrita.edu/index/login`
-2. **Visit** attendance page: `https://students.amrita.edu/client/class-attendance`  
-3. **Widget appears automatically** on the right side of the page
-4. **Click extension icon** in toolbar for popup summary
-
-## ✨ Features
-
-- **Real-time calculations**: Shows how many classes you can bunk
-- **Smart status**: Green (Safe), Yellow (Warning), Red (Danger)  
-- **Floating widget**: Movable widget on attendance page
-- **Popup summary**: Quick overview when clicking extension icon
-
-## 🔧 Files
-
-- `manifest.json` - Extension configuration
-- `content.js` - Main logic (scrapes attendance data)
-- `popup.html/js` - Popup interface  
-- `styles.css` - Styling
-
-## 📊 Calculations
-
-- **Safe (≥80%)**: "You can bunk X more classes and stay ≥75%"
-- **Warning (75-80%)**: "Be careful, limited bunks available"
-- **Danger (<75%)**: "Attend X consecutive classes to reach 75%"
-
-## 🛠️ Troubleshooting
-
-- **Widget not showing?** Refresh the attendance page
-- **No data?** Make sure you're logged into Amrita portal
-- **Errors?** Check browser console (F12)
 
 ---
 
-**Made for Amrita students by students! 🎓**
+| #   | Section                                                      |
+| --- | ------------------------------------------------------------ |
+| 1   | [Overview](#overview)                                        |
+| 2   | [Motivation (Why)](#motivation-why)                          |
+| 3   | [How It Works](#how-it-works)                                |
+| 4   | [Key Features](#key-features)                                |
+| 5   | [Installation](#installation)                                |
+| 6   | [Releases](#releases)                                        |
+| 7   | [Contributing](#contributing)                                |
+| 8   | [License](#license)                                          |
+
+
+---
+
+## Overview
+
+**AttendEase** is a browser extension designed for Amrita University students. It automatically scrapes attendance data from the official student portal and provides:
+
+* **Bunkable Classes**: Maximum lectures you can skip while maintaining at least 75% attendance.
+* **Recovery Classes**: Minimum lectures you need to attend if you’re below the threshold.
+
+Access real-time stats through a floating widget or via the extension popup—no manual entry needed.
+
+---
+
+## Motivation (Why)
+
+In my first year, I built a simple HTML/CSS/JS tool with my friend [Hemanth](https://github.com/hmnth-21) called [CampusCalc](https://github.com/midhunann/CampusCalc.git) to calculate attendance manually for any college. Although functional, it required manual entry for each course and was time-consuming.
+
+**AttendEase** evolved from CampusCalc to:
+
+1. Automatically scrape attendance data directly from our portal
+2. Save significant time, so you can focus on studies or well-earned breaks
+3. Eliminate human error with robust parsing and validation logic
+4. Provide instant insights through an interactive floating widget and popup UI
+
+---
+
+## How It Works
+
+<details>
+<summary>1. Content Script Injection</summary>
+
+* Targets URLs under `https://students.amrita.edu/client/class-attendance*`.
+* Injects `content.js` and `styles.css` into the attendance page.
+
+</details>
+
+<details>
+<summary>2. Data Extraction</summary>
+
+* Robust Selectors: Multiple DOM queries plus `MutationObserver` to handle dynamic content.
+* Table Parsing: Extracts course code/name, total, present, duty leave, absent, medical leave.
+* Retry Logic: Polling and exponential backoff for slow-loading pages.
+
+</details>
+
+<details>
+<summary>3. Calculations</summary>
+
+* Attendance % = `(present + dutyLeave) / totalClasses * 100`
+* Bunkable: Max classes you can skip to stay at or above 75%.
+* Recovery: Classes needed to reach 75% if below threshold.
+
+</details>
+
+<details>
+<summary>4. User Interfaces</summary>
+
+* Floating Widget: Draggable, collapsible, remembers its position in `localStorage`.
+* Extension Popup: Card-based summary with color codes:
+
+  * Safe (75% or above)
+  * Warning (70–75%)
+  * Danger (below 70%)
+
+</details>
+
+<details>
+<summary>5. Storage & Updates</summary>
+
+* Caches parsed data in Chrome `storage.local` for instant popup rendering.
+* On popup open, fetches fresh data via message passing from `content.js`.
+* Designed for seamless updates—simply push new versions to respective extension stores.
+
+</details>
+
+---
+
+## Key Features
+
+| Feature                | Description                                                               |
+| ---------------------- | ------------------------------------------------------------------------- |
+| Automatic Scraping     | No manual entry—directly reads your portal’s attendance table.            |
+| Real-Time Calculations | Instant bunkable and recovery numbers for each course.                    |
+| Floating Dashboard     | Widget stays on-page, draggable and collapsible.                          |
+| Extension Popup        | Quick summary in a popup UI with progress bars and status badges.         |
+| Minimal Permissions    | Only requests `activeTab`, `storage`, and host access to Amrita’s portal. |
+| Cross-Browser Ready    | Architecture supports Chrome, Edge, and Firefox (pending publication).    |
+
+---
+
+## Installation
+
+1. **Clone the repository**:
+
+   ```bash
+   git clone https://github.com/midhunann/amrita-attendease.git
+   ```
+
+2. **Load Unpacked Extension**:
+
+   * **Chrome / Edge**:
+
+     1. Navigate to `chrome://extensions` (or `edge://extensions`).
+     2. Enable Developer mode.
+     3. Click Load unpacked and select the project folder.
+
+   * **Firefox**:
+
+     1. Go to `about:debugging#/runtime/this-firefox`.
+     2. Click Load Temporary Add-on.
+     3. Select any file in the folder (e.g., `manifest.json`).
+
+3. **Open** the Amrita attendance page—AttendEase will auto-activate.
+
+---
+
+## Releases
+
+Yet to publish in:
+
+<p align="center">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/8/87/Google_Chrome_icon_%282011%29.png" alt="Chrome" width="32" />
+  &nbsp;&nbsp;
+  <img src="https://upload.wikimedia.org/wikipedia/commons/9/98/Microsoft_Edge_logo_%282019%29.svg" alt="Edge" width="32" />
+  &nbsp;&nbsp;
+  <img src="https://upload.wikimedia.org/wikipedia/commons/a/a0/Firefox_logo%2C_2019.svg" alt="Firefox" width="32" />
+</p>
+
+
+---
+
+## Contributing
+
+Contributions are welcome! You can:
+
+* Report bugs or suggest new features via [Issues](https://github.com/midhunann/AttendEase/issues).
+* Submit pull requests for enhancements—improve scraping logic, UI, accessibility, etc.
+* Enhance documentation with examples or clarify edge cases.
+---
+
+## License
+
+This project is licensed under the MIT License—see the [LICENSE](/LICENSE) file for details.
+
+© 2025 Midhunan Vijendra Prabhaharan
