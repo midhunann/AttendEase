@@ -237,6 +237,12 @@ class AmritaAttendanceTracker {
         return;
       }
 
+      // Calculate effective attendance using (present + dutyLeave) / total * 100
+      const effectiveAttendance = ((present + dutyLeave) / total) * 100;
+      
+      // Debug: Log the difference between website percentage and calculated percentage
+      console.log(`[AttendEase] ${courseCode}: Website=${percentage}%, Calculated=${effectiveAttendance.toFixed(1)}%, Present=${present}, DutyLeave=${dutyLeave}, Total=${total}`);
+      
       const subjectData = {
         id: index,
         courseCode: courseCode.substring(0, 20), // Limit length
@@ -248,9 +254,9 @@ class AmritaAttendanceTracker {
         dutyLeave,
         absent,
         medical,
-        percentage,
-        status: this.getStatus(percentage),
-        calculations: this.calculateScenarios(total, present, percentage)
+        percentage: effectiveAttendance, // Use calculated effective attendance
+        status: this.getStatus(effectiveAttendance),
+        calculations: this.calculateScenarios(total, present, dutyLeave, effectiveAttendance)
       };
 
       console.log(`[AttendEase] Processed subject:`, subjectData);
@@ -260,18 +266,19 @@ class AmritaAttendanceTracker {
     console.log('[AttendEase] Final scraped data:', this.tableData);
   }
 
-  calculateScenarios(total, present, currentPercentage) {
+  calculateScenarios(total, present, dutyLeave, currentPercentage) {
     const results = {};
+    const effectivePresent = present + dutyLeave; // Include duty leave in attendance
 
     if (currentPercentage >= this.MIN_ATTENDANCE) {
       // Calculate how many classes can be bunked
       let canBunk = 0;
       let futureTotal = total;
-      let futurePresent = present;
+      let futureEffectivePresent = effectivePresent;
 
       while (true) {
         futureTotal++;
-        const newPercentage = (futurePresent / futureTotal) * 100;
+        const newPercentage = (futureEffectivePresent / futureTotal) * 100;
         if (newPercentage >= this.MIN_ATTENDANCE) {
           canBunk++;
         } else {
@@ -287,11 +294,11 @@ class AmritaAttendanceTracker {
       // Calculate how many classes needed to reach 75%
       let needToAttend = 0;
       let futureTotal = total;
-      let futurePresent = present;
+      let futureEffectivePresent = effectivePresent;
 
-      while ((futurePresent / futureTotal) * 100 < this.MIN_ATTENDANCE) {
+      while ((futureEffectivePresent / futureTotal) * 100 < this.MIN_ATTENDANCE) {
         futureTotal++;
-        futurePresent++;
+        futureEffectivePresent++; // Attending increases effective present
         needToAttend++;
       }
 
@@ -378,7 +385,7 @@ class AmritaAttendanceTracker {
                   <div class="subject-left">
                     <div class="course-code">${subject.courseCode}</div>
                     <div class="course-name">${subject.courseName}</div>
-                    <div class="attendance-fraction">${subject.present}/${subject.total}</div>
+                    <div class="attendance-fraction">${subject.dutyLeave > 0 ? `${subject.present}+${subject.dutyLeave}` : subject.present}/${subject.total}</div>
                     <div class="absent-count">${subject.absent} absent</div>
                   </div>
                   <div class="subject-right">
