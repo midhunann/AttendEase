@@ -289,8 +289,8 @@
   right: 8px !important;
   top: 50% !important;
   transform: translateY(-50%) !important;
-  font-weight: 700 !important;
-  font-size: 10px !important;
+  font-weight: 900 !important;
+  font-size: 8px !important;
   color: #333 !important;
   /* text-shadow: 0 1px 3px rgba(0,0,0,0.8) !important; */
   z-index: 4 !important;
