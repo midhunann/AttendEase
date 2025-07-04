@@ -358,11 +358,10 @@ class AmritaAttendanceTracker {
     this.widget.innerHTML = `
       <div class="widget-header">
         <div class="widget-title">
-          <span class="widget-icon">🎯</span>
-          AttendEase
+          <span class="widget-icon">AttendEase</span>
         </div>
         <div class="widget-controls">
-          <button id="refresh-btn" class="control-btn" title="Refresh Data">🔄</button>
+          <button id="refresh-btn" class="control-btn" title="Refresh Data">↻</button>
           <button id="minimize-btn" class="control-btn" title="Minimize">−</button>
           <button id="close-btn" class="control-btn" title="Close">×</button>
         </div>
@@ -440,7 +439,11 @@ class AmritaAttendanceTracker {
     let xOffset = 0;
     let yOffset = 0;
 
+    // Add visual feedback for draggable area
+    header.style.cursor = 'move';
+    
     header.addEventListener('mousedown', (e) => {
+      // Don't start dragging if clicking on control buttons
       if (e.target.classList.contains('control-btn')) return;
       
       initialX = e.clientX - xOffset;
@@ -448,6 +451,11 @@ class AmritaAttendanceTracker {
 
       if (e.target === header || header.contains(e.target)) {
         isDragging = true;
+        header.style.cursor = 'grabbing';
+        this.widget.style.zIndex = '1000000'; // Bring to front while dragging
+        
+        // Add dragging class for visual feedback
+        this.widget.classList.add('dragging');
       }
     });
 
@@ -456,6 +464,15 @@ class AmritaAttendanceTracker {
         e.preventDefault();
         currentX = e.clientX - initialX;
         currentY = e.clientY - initialY;
+        
+        // Keep widget within viewport bounds
+        const rect = this.widget.getBoundingClientRect();
+        const maxX = window.innerWidth - rect.width;
+        const maxY = window.innerHeight - rect.height;
+        
+        currentX = Math.max(0, Math.min(currentX, maxX));
+        currentY = Math.max(0, Math.min(currentY, maxY));
+        
         xOffset = currentX;
         yOffset = currentY;
 
@@ -464,10 +481,44 @@ class AmritaAttendanceTracker {
     });
 
     document.addEventListener('mouseup', () => {
-      initialX = currentX;
-      initialY = currentY;
-      isDragging = false;
+      if (isDragging) {
+        initialX = currentX;
+        initialY = currentY;
+        isDragging = false;
+        header.style.cursor = 'move';
+        this.widget.style.zIndex = '999999'; // Reset z-index
+        
+        // Remove dragging class
+        this.widget.classList.remove('dragging');
+        
+        // Save position to localStorage for persistence
+        this.saveWidgetPosition(currentX, currentY);
+      }
     });
+
+    // Load saved position
+    this.loadWidgetPosition();
+  }
+
+  saveWidgetPosition(x, y) {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('attendease-widget-position', JSON.stringify({ x, y }));
+    }
+  }
+
+  loadWidgetPosition() {
+    if (typeof localStorage !== 'undefined') {
+      const saved = localStorage.getItem('attendease-widget-position');
+      if (saved) {
+        try {
+          const { x, y } = JSON.parse(saved);
+          this.widget.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+        } catch (e) {
+          // If parsing fails, use default position
+          console.warn('Failed to parse saved widget position');
+        }
+      }
+    }
   }
 
   showWidget() {
