@@ -158,6 +158,23 @@ class PopupManager {
   }
 
   setupEventListeners() {
+    // Go to attendance page button (main)
+    document.getElementById('go-to-attendance-main').addEventListener('click', async () => {
+      try {
+        if (typeof chrome === 'undefined' || !chrome.tabs) {
+          alert('Chrome APIs not available');
+          return;
+        }
+
+        const url = 'https://students.amrita.edu/client/class-attendance';
+        await chrome.tabs.create({ url: url });
+        window.close();
+      } catch (error) {
+        console.error('Error opening attendance page:', error);
+        alert('Error opening attendance page');
+      }
+    });
+
     // Toggle widget button
     document.getElementById('toggle-widget').addEventListener('click', async () => {
       try {
