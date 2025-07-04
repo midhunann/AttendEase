@@ -143,8 +143,21 @@
             left: 0;
             width: 4px;
             height: 6px;
-            background: inherit;
-            z-index: 2;
+            z-index: 4;
+            transition: all 0.3s ease;
+        }
+
+        /* Corner connection piece - extends into progress bar */
+        .subject-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 12px;
+            height: 6px;
+            z-index: 3;
+            border-radius: 0 0 0 12px;
+            transition: all 0.3s ease;
         }
 
         .subject-card:hover {
@@ -159,11 +172,17 @@
         .subject-card.safe::before {
             background: #28a745;
         }
+        .subject-card.safe::after {
+            background: #28a745;
+        }
         .subject-card.warning { 
             border-left-color: #ffc107; 
             background: linear-gradient(135deg, #fffef8 0%, #fff8e1 100%);
         }
         .subject-card.warning::before {
+            background: #ffc107;
+        }
+        .subject-card.warning::after {
             background: #ffc107;
         }
         .subject-card.danger { 
@@ -173,13 +192,17 @@
         .subject-card.danger::before {
             background: #dc3545;
         }
+        .subject-card.danger::after {
+            background: #dc3545;
+        }
 
         .subject-card-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 12px;
-            margin-bottom: 12px;
+            margin-bottom: 4px;
+            padding-bottom: 4px;
         }
 
         /* Progress Bottom Border */
@@ -191,24 +214,56 @@
             position: relative;
             display: flex;
             align-items: center;
+            margin-top: 4px;
+            margin-left: 0;
         }
 
         .progress-fill {
             height: 100%;
-            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
             position: absolute;
             left: 0;
             top: 0;
+            border-radius: 0 0 12px 12px;
+            margin-left: 0;
         }
 
         .progress-fill.safe { 
             background: linear-gradient(90deg, #28a745, #20c997); 
+            border-radius: 0 0 12px 12px;
         }
         .progress-fill.warning { 
             background: linear-gradient(90deg, #ffc107, #fd7e14); 
+            border-radius: 0 0 12px 12px;
         }
         .progress-fill.danger { 
             background: linear-gradient(90deg, #dc3545, #e91e63); 
+            border-radius: 0 0 12px 12px;
+        }
+
+        /* Ensure progress fill starts from exact left edge */
+        .progress-fill.safe::before,
+        .progress-fill.warning::before,
+        .progress-fill.danger::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            z-index: 5;
+        }
+
+        .progress-fill.safe::before {
+            background: #28a745;
+        }
+
+        .progress-fill.warning::before {
+            background: #ffc107;
+        }
+
+        .progress-fill.danger::before {
+            background: #dc3545;
         }
 
         .progress-target {
@@ -238,20 +293,19 @@
 
         .attendance-percentage-text {
             position: absolute;
-            right: 4px;
+            right: 8px;
             top: 50%;
             transform: translateY(-50%);
-            font-weight: 800;
-            font-size: 11px;
+            font-weight: 700;
+            font-size: 10px;
             color: #ffffff;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            z-index: 3;
-            background: rgba(0,0,0,0.3);
-            padding: 2px 4px;
-            border-radius: 3px;
-            backdrop-filter: blur(2px);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            z-index: 4;
+            background: transparent;
+            padding: 2px 6px;
+            border-radius: 4px;
             line-height: 1;
-            min-width: 24px;
+            min-width: 30px;
             text-align: center;
         }
 
