@@ -83,26 +83,7 @@ class PopupManager {
 
     this.hideLoading();
     this.showContent();
-    this.renderOverallStats();
     this.renderSubjects();
-  }
-
-  renderOverallStats() {
-    const stats = this.calculateOverallStats();
-    
-    const statusIndicator = document.getElementById('status-indicator');
-    const statusText = document.getElementById('status-text');
-    const safeCount = document.getElementById('safe-count');
-    const totalSubjects = document.getElementById('total-subjects');
-
-    // Update status
-    statusIndicator.textContent = this.getStatusIcon(stats.status);
-    statusText.textContent = stats.statusText;
-    statusText.className = `status-text status-${stats.status}`;
-
-    // Update counts
-    safeCount.textContent = stats.safeCount;
-    totalSubjects.textContent = this.attendanceData.length;
   }
 
   renderSubjects() {
@@ -173,35 +154,6 @@ class PopupManager {
           <div class="bunk-text-bottom">classes</div>
         </div>
       `;
-    }
-  }
-
-  calculateOverallStats() {
-    const safeCount = this.attendanceData.filter(s => s.status === 'safe').length;
-    const warningCount = this.attendanceData.filter(s => s.status === 'warning').length;
-    const dangerCount = this.attendanceData.filter(s => s.status === 'danger').length;
-
-    let status, statusText;
-    if (dangerCount > 0) {
-      status = 'danger';
-      statusText = `${dangerCount} subjects need attention!`;
-    } else if (warningCount > 0) {
-      status = 'warning';
-      statusText = `${warningCount} subjects need care`;
-    } else {
-      status = 'safe';
-      statusText = 'All subjects are safe!';
-    }
-
-    return { safeCount, warningCount, dangerCount, status, statusText };
-  }
-
-  getStatusIcon(status) {
-    switch (status) {
-      case 'safe': return '✅';
-      case 'warning': return '⚠️';
-      case 'danger': return '🚨';
-      default: return '❓';
     }
   }
 

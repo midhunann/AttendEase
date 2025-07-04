@@ -15,7 +15,7 @@
             width: 420px;
             min-height: 500px;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #bf0d4f 0%, #bf0d4f 100%);
             color: #333;
         }
 
@@ -25,7 +25,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #bf0d4f 0%, #bf0d4f 100%);
             color: white;
             padding: 20px;
             text-align: center;
@@ -44,72 +44,6 @@
 
         .content {
             padding: 20px;
-        }
-
-        .status-section {
-            margin-bottom: 20px;
-        }
-
-        .overall-status {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 15px;
-            border: 1px solid rgba(0,0,0,0.1);
-        }
-
-        .status-indicator {
-            font-size: 32px;
-            margin-bottom: 8px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-        }
-
-        .status-text {
-            font-weight: 700;
-            font-size: 18px;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-
-        .status-safe { color: #28a745; }
-        .status-warning { color: #ffc107; }
-        .status-danger { color: #dc3545; }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            border: 1px solid rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .stat-number {
-            font-size: 28px;
-            font-weight: 800;
-            color: #333;
-            line-height: 1;
-            margin-bottom: 4px;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #666;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         .subjects-section h3 {
@@ -298,8 +232,7 @@
             transform: translateY(-50%);
             font-weight: 700;
             font-size: 10px;
-            color: #ffffff;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            color: #333;
             z-index: 4;
             background: transparent;
             padding: 2px 6px;
@@ -330,35 +263,36 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-width: 80px;
+            min-width: 70px;
+            min-height: 50px;
             background: rgba(255,255,255,0.8);
-            border-radius: 8px;
-            padding: 8px;
+            border-radius: 6px;
+            padding: 6px;
         }
 
         .subject-code {
             font-weight: 700;
-            font-size: 14px;
+            font-size: 13px;
             color: #333;
             margin-bottom: 2px;
         }
 
         .subject-name {
-            font-size: 11px;
+            font-size: 10px;
             color: #666;
             line-height: 1.2;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
 
         .attendance-fraction {
             font-weight: 600;
-            font-size: 12px;
+            font-size: 11px;
             color: #555;
             margin-bottom: 1px;
         }
 
         .absent-count {
-            font-size: 10px;
+            font-size: 9px;
             color: #888;
             font-weight: 500;
         }
@@ -383,32 +317,40 @@
             justify-content: center;
             height: 100%;
             min-height: 50px;
+            width: 100%;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.9);
+            transition: all 0.2s ease;
+        }
+
+        .bunk-section:hover {
+            transform: translateY(-1px);
         }
 
         .bunk-text-top {
-            font-size: 9px;
+            font-size: 8px;
             font-weight: 600;
             color: #666;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             margin-bottom: 2px;
         }
 
         .bunk-number {
-            font-size: 28px;
-            font-weight: 900;
+            font-size: 20px;
+            font-weight: 700;
             color: #333;
             line-height: 1;
-            margin: 2px 0;
+            margin: 1px 0;
         }
 
         .bunk-text-bottom {
-            font-size: 9px;
+            font-size: 8px;
             color: #666;
             font-weight: 600;
             margin-top: 2px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
         }
 
         .danger-message {
@@ -418,47 +360,6 @@
             padding: 4px;
             color: #721c24;
             font-size: 8px;
-            font-weight: 600;
-            text-align: center;
-            line-height: 1.2;
-        }
-
-        .bunk-section {
-            background: rgba(255,255,255,0.7);
-            border-radius: 8px;
-            padding: 8px;
-            text-align: center;
-        }
-
-        .bunk-number {
-            font-size: 24px;
-            font-weight: 900;
-            color: #333;
-            line-height: 1;
-            margin-bottom: 2px;
-        }
-
-        .bunk-text {
-            font-size: 10px;
-            font-weight: 600;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .bunk-classes {
-            font-size: 9px;
-            color: #888;
-            margin-top: 1px;
-        }
-
-        .danger-message {
-            background: rgba(220, 53, 69, 0.1);
-            border: 1px solid rgba(220, 53, 69, 0.3);
-            border-radius: 6px;
-            padding: 6px;
-            color: #721c24;
-            font-size: 10px;
             font-weight: 600;
             text-align: center;
             line-height: 1.2;
@@ -525,14 +426,14 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #bf0d4f 0%, #bf0d4f 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 12px rgba(191, 13, 79, 0.4);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+            box-shadow: 0 6px 16px rgba(191, 13, 79, 0.5);
         }
 
         .btn-secondary {
@@ -601,24 +502,6 @@
         </div>
 
         <div id="content" class="content" style="display: none;">
-            <div class="status-section">
-                <div class="overall-status">
-                    <div id="status-indicator" class="status-indicator">✅</div>
-                    <div id="status-text" class="status-text">All Good!</div>
-                </div>
-
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div id="safe-count" class="stat-number">0</div>
-                        <div class="stat-label">Safe Subjects</div>
-                    </div>
-                    <div class="stat-card">
-                        <div id="total-subjects" class="stat-number">0</div>
-                        <div class="stat-label">Total Subjects</div>
-                    </div>
-                </div>
-            </div>
-
             <div class="subjects-section">
                 <h3>📚 Subject Details</h3>
                 <div id="subject-list" class="subject-list"></div>

@@ -103,45 +103,6 @@
   border-radius: 3px !important;
 }
 
-/* Overall Stats */
-.overall-stats {
-  background: #f8f9fa !important;
-  border-radius: 8px !important;
-  padding: 12px !important;
-  margin-bottom: 16px !important;
-  display: flex !important;
-  justify-content: space-between !important;
-}
-
-.stat-item {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-}
-
-.stat-label {
-  font-size: 12px !important;
-  color: #666 !important;
-  margin-bottom: 4px !important;
-}
-
-.stat-value {
-  font-weight: 600 !important;
-  font-size: 14px !important;
-}
-
-.stat-value.status-safe {
-  color: #28a745 !important;
-}
-
-.stat-value.status-warning {
-  color: #ffc107 !important;
-}
-
-.stat-value.status-danger {
-  color: #dc3545 !important;
-}
-
 /* Subjects List */
 .subjects-list {
   display: flex !important;

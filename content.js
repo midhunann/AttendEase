@@ -355,8 +355,6 @@ class AmritaAttendanceTracker {
     this.widget.id = 'amrita-attendance-widget';
     this.widget.className = 'amrita-widget hidden';
 
-    const overallStats = this.calculateOverallStats();
-
     this.widget.innerHTML = `
       <div class="widget-header">
         <div class="widget-title">
@@ -371,17 +369,6 @@ class AmritaAttendanceTracker {
       </div>
       
       <div class="widget-content">
-        <div class="overall-stats">
-          <div class="stat-item">
-            <span class="stat-label">Overall Status:</span>
-            <span class="stat-value status-${overallStats.status}">${overallStats.statusText}</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Safe Subjects:</span>
-            <span class="stat-value">${overallStats.safeCount}/${this.tableData.length}</span>
-          </div>
-        </div>
-
         <div class="subjects-list">
           ${this.tableData.map(subject => {
             const bunkContent = this.getBunkContent(subject);
@@ -418,26 +405,6 @@ class AmritaAttendanceTracker {
     setTimeout(() => {
       this.showWidget();
     }, 1000);
-  }
-
-  calculateOverallStats() {
-    const safeCount = this.tableData.filter(s => s.status === 'safe').length;
-    const warningCount = this.tableData.filter(s => s.status === 'warning').length;
-    const dangerCount = this.tableData.filter(s => s.status === 'danger').length;
-
-    let status, statusText;
-    if (dangerCount > 0) {
-      status = 'danger';
-      statusText = 'Action Required';
-    } else if (warningCount > 0) {
-      status = 'warning';
-      statusText = 'Be Careful';
-    } else {
-      status = 'safe';
-      statusText = 'All Good!';
-    }
-
-    return { safeCount, warningCount, dangerCount, status, statusText };
   }
 
   attachEventListeners() {
