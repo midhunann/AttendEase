@@ -5,7 +5,7 @@ Maximize your bunks! Skip as many classes as possible while maintaining at least
 
 [![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/midhunann/amrita-attendease)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](/LICENSE)
-[![Chrome Web Store – Not Published](https://img.shields.io/badge/Chrome%20Web%20Store-Not%20Published-lightgrey?logo=googlechrome)](#)
+[![Chrome Web Store Published](https://img.shields.io/badge/Chrome%20Web%20Store-Published-brightgreen?logo=googlechrome)](https://chromewebstore.google.com/detail/attendease/nijdgjjkkoeoakfjcbpikjhhomnnbbnj)
 [![Firefox Add‑on – Not Published](https://img.shields.io/badge/Firefox%20Add--on-Not%20Published-lightgrey?logo=firefox)](#)
 [![Edge Add‑on – Not Published](https://img.shields.io/badge/Edge%20Add--on-Not%20Published-lightgrey?logo=microsoftedge)](#)
 
@@ -148,8 +148,6 @@ In my first year, I built a simple HTML/CSS/JS tool with my friend [Hemanth](htt
 Yet to publish in:
 
 <p align="center">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/8/87/Google_Chrome_icon_%282011%29.png" alt="Chrome" width="32" />
-  &nbsp;&nbsp;
   <img src="https://upload.wikimedia.org/wikipedia/commons/9/98/Microsoft_Edge_logo_%282019%29.svg" alt="Edge" width="32" />
   &nbsp;&nbsp;
   <img src="https://upload.wikimedia.org/wikipedia/commons/a/a0/Firefox_logo%2C_2019.svg" alt="Firefox" width="32" />
