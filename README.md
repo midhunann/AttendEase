@@ -6,7 +6,7 @@ Maximize your bunks! Skip as many classes as possible while maintaining at least
 [![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/midhunann/amrita-attendease)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](/LICENSE)
 [![Chrome Web Store Published](https://img.shields.io/badge/Chrome%20Web%20Store-Published-brightgreen?logo=googlechrome)](https://chromewebstore.google.com/detail/attendease/nijdgjjkkoeoakfjcbpikjhhomnnbbnj)
-[![Firefox Add‑on – Not Published](https://img.shields.io/badge/Firefox%20Add--on-Not%20Published-lightgrey?logo=firefox)](#)
+[![Firefox Add‑on – Published](https://img.shields.io/badge/Firefox%20Add--on-Published-brightgreen?logo=firefox)](https://addons.mozilla.org/addon/attendease/)
 [![Edge Add‑on – Not Published](https://img.shields.io/badge/Edge%20Add--on-Not%20Published-lightgrey?logo=microsoftedge)](#)
 
 
