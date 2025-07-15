@@ -7,7 +7,7 @@ Maximize your bunks! Skip as many classes as possible while maintaining at least
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](/LICENSE)
 [![Chrome Web Store Published](https://img.shields.io/badge/Chrome%20Web%20Store-Published-brightgreen?logo=googlechrome)](https://chromewebstore.google.com/detail/attendease/nijdgjjkkoeoakfjcbpikjhhomnnbbnj)
 [![Firefox Add‑on – Published](https://img.shields.io/badge/Firefox%20Add--on-Published-brightgreen?logo=firefox)](https://addons.mozilla.org/addon/attendease/)
-[![Edge Add‑on – Not Published](https://img.shields.io/badge/Edge%20Add--on-Not%20Published-lightgrey?logo=microsoftedge)](#)
+[![Edge Add‑on – Published](https://img.shields.io/badge/Edge%20Add--on-Published-brightgreen?logo=microsoftedge&logoColor=white)](https://microsoftedge.microsoft.com/addons/detail/attendease/chpobdolboifooeeoccpdponbjdicfgk)
 
 
 ---
