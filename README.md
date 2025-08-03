@@ -145,13 +145,15 @@ In my first year, I built a simple HTML/CSS/JS tool with my friend [Hemanth](htt
 
 ## Releases
 
-Yet to publish in:
+## Releases
 
-<p align="center">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/9/98/Microsoft_Edge_logo_%282019%29.svg" alt="Edge" width="32" />
-  &nbsp;&nbsp;
-  <img src="https://upload.wikimedia.org/wikipedia/commons/a/a0/Firefox_logo%2C_2019.svg" alt="Firefox" width="32" />
-</p>
+AttendEase is officially published and available across all major browsers. You can install it directly from your preferred store:
+
+| Browser | Platform |
+| :--- | :--- |
+| <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Chrome_icon_%28September_2014%29.svg" alt="Chrome" height="24" valign="middle" /> &nbsp; **Google Chrome** | [Install from the **Chrome Web Store**](https://chromewebstore.google.com/detail/attendease/nijdgjjkkoeoakfjcbpikjhhomnnbbnj) |
+| <img src="https://upload.wikimedia.org/wikipedia/commons/a/a0/Firefox_logo%2C_2019.svg" alt="Firefox" height="24" valign="middle" /> &nbsp; **Mozilla Firefox** | [Install from **Firefox Add-ons**](https://addons.mozilla.org/addon/attendease/) |
+| <img src="https://upload.wikimedia.org/wikipedia/commons/9/98/Microsoft_Edge_logo_%282019%29.svg" alt="Edge" height="24" valign="middle" /> &nbsp; **Microsoft Edge** | [Install from **Microsoft Edge Add-ons**](https://microsoftedge.microsoft.com/addons/detail/attendease/chpobdolboifooeeoccpdponbjdicfgk) |
 
 
 ---
