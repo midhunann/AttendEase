@@ -90,24 +90,25 @@
 }
 
 .ml-toggle-label {
-  width: 56px !important; /* Increased width to fit the circle better */
-  height: 28px !important; /* Increased height to match other controls */
-  background: rgba(255, 255, 255, 0.2) !important;
+  width: 56px !important;
+  height: 28px !important;
+  background: rgba(255, 255, 255, 0.15) !important;
   border-radius: 14px !important;
   cursor: pointer !important;
   position: relative !important;
-  transition: all 0.3s ease !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: flex-end !important;
   padding: 0 !important;
   margin: 0 !important;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1) !important;
 }
 
 .ml-toggle-label::before {
   content: '' !important;
   position: absolute !important;
-  width: 24px !important; /* Increased circle size */
+  width: 24px !important;
   height: 24px !important;
   border-radius: 50% !important;
   background: #fff !important;
@@ -117,34 +118,38 @@
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
 }
 
 .ml-text {
-  font-size: 13px !important; /* Slightly larger font */
+  font-size: 13px !important;
   font-weight: 600 !important;
-  color: #fff !important;
+  color: rgba(255, 255, 255, 0.7) !important;
   position: absolute !important;
   right: 8px !important;
-  transition: all 0.3s ease !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   z-index: 2 !important;
   pointer-events: none !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
 }
 
 .ml-toggle:checked + .ml-toggle-label {
-  background: rgba(255, 255, 255, 0.4) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  box-shadow: inset 0 1px 3px rgba(191, 13, 79, 0.2) !important;
 }
 
 .ml-toggle:checked + .ml-toggle-label::before {
-  transform: translateX(28px) !important; /* Adjusted for new width */
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+  transform: translateX(28px) !important;
+  background: #bf0d4f !important;
+  box-shadow: 0 2px 4px rgba(191, 13, 79, 0.3) !important;
 }
 
 .ml-toggle:checked + .ml-toggle-label .ml-text {
-  color: #000 !important;
-  right: 4px !important; /* Keep text on right side */
-  transform: translateX(-28px) !important; /* Move with the circle */
+  color: #bf0d4f !important;
+  right: 4px !important;
+  transform: translateX(-28px) !important;
+  text-shadow: none !important;
+  font-weight: 700 !important;
 }
 
 .control-btn {
