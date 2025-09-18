@@ -27,9 +27,10 @@ class PopupManager {
   async loadStoredData() {
     return new Promise((resolve) => {
       if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-        chrome.storage.local.get(['attendanceData', 'lastUpdated'], (result) => {
+        chrome.storage.local.get(['attendanceData', 'lastUpdated', 'includeMedical'], (result) => {
           if (result.attendanceData && result.attendanceData.length > 0) {
             this.attendanceData = result.attendanceData;
+            this.includeMedical = result.includeMedical || false;
             this.renderData();
           }
           resolve();
