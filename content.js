@@ -9,19 +9,41 @@ class AmritaAttendanceTracker {
     this.tableData = [];
     this.widget = null;
     this.isWidgetVisible = false;
+    this.includeMedical = false; // Initialize medical leave toggle state
     
     this.init();
   }
 
   init() {
     console.log('[AttendEase] Content script initializing...');
-    console.log('[AttendEase] Current URL:', window.location.href);
     
-    // Start with immediate check
-    this.startTableDetection();
-    
-    // Also set up a MutationObserver to watch for dynamic content loading
-    this.setupMutationObserver();
+    // Load medical toggle state from storage
+    this.loadMLToggleState().then(() => {
+      // Start with immediate check
+      this.startTableDetection();
+      
+      // Also set up a MutationObserver to watch for dynamic content loading
+      this.setupMutationObserver();
+    });
+  }
+
+  async loadMLToggleState() {
+    return new Promise((resolve) => {
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.get(['includeMedical'], (result) => {
+          this.includeMedical = result.includeMedical || false;
+          resolve();
+        });
+      } else {
+        resolve();
+      }
+    });
+  }
+
+  async saveMLToggleState() {
+    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+      await chrome.storage.local.set({ includeMedical: this.includeMedical });
+    }
   }
 
   startTableDetection() {
@@ -237,16 +259,17 @@ class AmritaAttendanceTracker {
         return;
       }
 
-      // Calculate effective attendance using (present + dutyLeave) / total * 100
-      const effectiveAttendance = ((present + dutyLeave) / total) * 100;
+      // Calculate effective attendance including medical leave if toggle is on
+      const effectivePresent = present + dutyLeave + (this.includeMedical ? medical : 0);
+      const effectiveAttendance = (effectivePresent / total) * 100;
       
-      // Debug: Log the difference between website percentage and calculated percentage
-      console.log(`[AttendEase] ${courseCode}: Website=${percentage}%, Calculated=${effectiveAttendance.toFixed(1)}%, Present=${present}, DutyLeave=${dutyLeave}, Total=${total}`);
+      // Debug: Log the attendance calculation
+      console.log(`[AttendEase] ${courseCode}: Present=${present}, DutyLeave=${dutyLeave}, Medical=${medical}, Total=${total}, ML=${this.includeMedical}, Calculated=${effectiveAttendance.toFixed(1)}%`);
       
       const subjectData = {
         id: index,
         serialNumber: slNo,
-        courseCode: courseCode.substring(0, 20), // Limit length
+        courseCode: courseCode.substring(0, 20),
         courseName: courseName.substring(0, 50),
         className,
         faculty,
@@ -255,9 +278,9 @@ class AmritaAttendanceTracker {
         dutyLeave,
         absent,
         medical,
-        percentage: effectiveAttendance, // Use calculated effective attendance
+        percentage: effectiveAttendance,
         status: this.getStatus(effectiveAttendance),
-        calculations: this.calculateScenarios(total, present, dutyLeave, effectiveAttendance)
+        calculations: this.calculateScenarios(total, present, dutyLeave, medical, effectiveAttendance)
       };
 
       console.log(`[AttendEase] Processed subject:`, subjectData);
@@ -267,9 +290,9 @@ class AmritaAttendanceTracker {
     console.log('[AttendEase] Final scraped data:', this.tableData);
   }
 
-  calculateScenarios(total, present, dutyLeave, currentPercentage) {
+  calculateScenarios(total, present, dutyLeave, medical, currentPercentage) {
     const results = {};
-    const effectivePresent = present + dutyLeave; // Include duty leave in attendance
+    const effectivePresent = present + dutyLeave + (this.includeMedical ? medical : 0);
 
     // Safety check for edge cases
     if (total <= 0) {
@@ -281,14 +304,14 @@ class AmritaAttendanceTracker {
 
     // Validate input data consistency
     if (effectivePresent > total) {
-      console.warn(`[AttendEase] Data inconsistency: effectivePresent (${effectivePresent}) > total (${total})`);
+      console.warn(`[AttendEase] Data consistency check: Present=${present}, DutyLeave=${dutyLeave}, Medical=${medical}, Total=${total}`);
       results.canBunk = 0;
       results.needToAttend = 0;
       results.message = 'Data inconsistency detected';
       return results;
     }
 
-    // Recalculate percentage to ensure accuracy
+    // Calculate actual percentage including medical leave if enabled
     const actualPercentage = (effectivePresent / total) * 100;
 
     if (actualPercentage >= this.MIN_ATTENDANCE) {
@@ -389,6 +412,12 @@ class AmritaAttendanceTracker {
           <span class="widget-icon">AttendEase</span>
         </div>
         <div class="widget-controls">
+          <div class="ml-toggle-container" title="Include Medical Leave">
+            <input type="checkbox" id="ml-toggle" class="ml-toggle" ${this.includeMedical ? 'checked' : ''}>
+            <label for="ml-toggle" class="ml-toggle-label">
+              <span class="ml-text">ML</span>
+            </label>
+          </div>
           <button id="refresh-btn" class="control-btn" title="Refresh Data">↻</button>
           <button id="minimize-btn" class="control-btn" title="Minimize">−</button>
           <button id="close-btn" class="control-btn" title="Close">×</button>
@@ -438,11 +467,36 @@ class AmritaAttendanceTracker {
     const refreshBtn = this.widget.querySelector('#refresh-btn');
     const minimizeBtn = this.widget.querySelector('#minimize-btn');
     const closeBtn = this.widget.querySelector('#close-btn');
+    const mlToggle = this.widget.querySelector('#ml-toggle');
+
+    mlToggle.addEventListener('change', async () => {
+      this.includeMedical = mlToggle.checked;
+      await this.saveMLToggleState();
+      
+      // Update data with smooth transition
+      const subjectsList = this.widget.querySelector('.subjects-list');
+      subjectsList.style.transition = 'opacity 0.3s ease';
+      subjectsList.style.opacity = '0';
+      
+      setTimeout(() => {
+        this.scrapeAttendanceData();
+        this.updateWidgetContent();
+        subjectsList.style.opacity = '1';
+        this.saveDataToStorage();
+      }, 300);
+    });
 
     refreshBtn.addEventListener('click', () => {
-      this.scrapeAttendanceData();
-      this.createFloatingWidget();
-      this.saveDataToStorage();
+      const subjectsList = this.widget.querySelector('.subjects-list');
+      subjectsList.style.transition = 'opacity 0.3s ease';
+      subjectsList.style.opacity = '0';
+      
+      setTimeout(() => {
+        this.scrapeAttendanceData();
+        this.updateWidgetContent();
+        subjectsList.style.opacity = '1';
+        this.saveDataToStorage();
+      }, 300);
     });
 
     minimizeBtn.addEventListener('click', () => {
@@ -453,7 +507,6 @@ class AmritaAttendanceTracker {
       this.hideWidget();
     });
 
-    // Make widget draggable
     this.makeDraggable();
   }
 
@@ -567,10 +620,44 @@ class AmritaAttendanceTracker {
     }
   }
 
+  updateWidgetContent() {
+    const subjectsList = this.widget.querySelector('.subjects-list');
+    if (!subjectsList) return;
+
+    subjectsList.innerHTML = this.tableData.map(subject => {
+      const bunkContent = this.getBunkContent(subject);
+      const attendance = subject.dutyLeave > 0 ? 
+        `${subject.present}+${subject.dutyLeave}${this.includeMedical && subject.medical > 0 ? '+' + subject.medical : ''}/${subject.total}` :
+        `${subject.present}${this.includeMedical && subject.medical > 0 ? '+' + subject.medical : ''}/${subject.total}`;
+      
+      return `
+        <div class="subject-card status-${subject.status}">
+          <div class="subject-card-content">
+            <div class="subject-left">
+              <div class="course-code">${subject.serialNumber} | ${subject.courseCode}</div>
+              <div class="course-name">${subject.courseName}</div>
+              <div class="attendance-fraction">${attendance}</div>
+              <div class="absent-count">${subject.absent} absent</div>
+            </div>
+            <div class="subject-right">
+              ${bunkContent}
+            </div>
+          </div>
+          <div class="progress-bottom-border">
+            <div class="progress-fill ${subject.status}" style="width: ${Math.min(subject.percentage, 100)}%"></div>
+            <div class="progress-target"></div>
+            <div class="attendance-percentage-text ${subject.status}">${subject.percentage.toFixed(1)}%</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
   saveDataToStorage() {
     if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
       chrome.storage.local.set({
         attendanceData: this.tableData,
+        includeMedical: this.includeMedical,
         lastUpdated: new Date().toISOString()
       });
     }
