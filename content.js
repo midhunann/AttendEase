@@ -17,9 +17,10 @@ class AmritaAttendanceTracker {
   init() {
     console.log('[AttendEase] Content script initializing...');
     
-    // Load medical toggle state from storage
+    // Load medical toggle state from storage first
     this.loadMLToggleState().then(() => {
-      // Start with immediate check
+      console.log('[AttendEase] ML toggle state loaded:', this.includeMedical);
+      // Start with immediate check - data will be calculated with correct ML state
       this.startTableDetection();
       
       // Also set up a MutationObserver to watch for dynamic content loading
@@ -28,32 +29,35 @@ class AmritaAttendanceTracker {
   }
 
   async loadMLToggleState() {
-    return new Promise((resolve) => {
+    try {
       if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-        chrome.storage.local.get(['includeMedical'], (result) => {
-          this.includeMedical = result.includeMedical || false;
-          resolve();
-        });
-      } else {
-        resolve();
+        const result = await chrome.storage.local.get(['includeMedical']);
+        this.includeMedical = result.includeMedical || false;
       }
-    });
+    } catch (error) {
+      console.error('[AttendEase] Failed to load medical leave toggle state:', error);
+      this.includeMedical = false; // Default fallback
+    }
   }
 
   async saveMLToggleState() {
-    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-      await chrome.storage.local.set({ includeMedical: this.includeMedical });
+    try {
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        await chrome.storage.local.set({ includeMedical: this.includeMedical });
+      }
+    } catch (error) {
+      console.error('[AttendEase] Failed to save medical leave toggle state:', error);
     }
   }
 
   startTableDetection() {
     // Wait for table to load
-    this.waitForTable().then(() => {
+    this.waitForTable().then(async () => {
       console.log('[AttendEase] Table found, scraping data...');
       this.scrapeAttendanceData();
       console.log('[AttendEase] Data scraped:', this.tableData.length, 'subjects');
       this.createFloatingWidget();
-      this.saveDataToStorage();
+      await this.saveDataToStorage();
     }).catch(error => {
       console.error('[AttendEase] Error during initialization:', error);
       // Fallback: try again after a longer delay
@@ -85,8 +89,8 @@ class AmritaAttendanceTracker {
       
       if (shouldCheck && this.tableData.length === 0) {
         console.log('[AttendEase] DOM changes detected, checking for attendance data...');
-        setTimeout(() => {
-          this.checkAndUpdateData();
+        setTimeout(async () => {
+          await this.checkAndUpdateData();
         }, 1000);
       }
     });
@@ -98,7 +102,7 @@ class AmritaAttendanceTracker {
     });
   }
 
-  checkAndUpdateData() {
+  async checkAndUpdateData() {
     // Quick check if we now have data
     const table = document.getElementById('home_tab') || 
                   document.querySelector('table[class*="attendance"]') ||
@@ -107,11 +111,9 @@ class AmritaAttendanceTracker {
                   
     if (table) {
       const rows = table.querySelectorAll('tr');
-      const dataRows = Array.from(rows).filter((row, index) => {
-        // Skip header row (index 0) and check if row has sufficient cells
-        if (index === 0) return false;
-        const cells = row.querySelectorAll('td, th');
-        return cells.length >= 5;
+      const dataRows = Array.from(rows).filter(row => {
+        const cells = row.querySelectorAll('td');
+        return cells.length >= 8; // Adjust based on your table structure
       });
       
       if (dataRows.length > 0 && this.tableData.length === 0) {
@@ -119,7 +121,7 @@ class AmritaAttendanceTracker {
         this.scrapeAttendanceData();
         if (this.tableData.length > 0) {
           this.createFloatingWidget();
-          this.saveDataToStorage();
+          await this.saveDataToStorage();
         }
       }
     }
@@ -426,35 +428,17 @@ class AmritaAttendanceTracker {
       
       <div class="widget-content">
         <div class="subjects-list">
-          ${this.tableData.map(subject => {
-            const bunkContent = this.getBunkContent(subject);
-            
-            return `
-              <div class="subject-card status-${subject.status}">
-                <div class="subject-card-content">
-                  <div class="subject-left">
-                    <div class="course-code">${subject.serialNumber} | ${subject.courseCode}</div>
-                    <div class="course-name">${subject.courseName}</div>
-                    <div class="attendance-fraction">${subject.dutyLeave > 0 ? `${subject.present}+${subject.dutyLeave}` : subject.present}/${subject.total}</div>
-                    <div class="absent-count">${subject.absent} absent</div>
-                  </div>
-                  <div class="subject-right">
-                    ${bunkContent}
-                  </div>
-                </div>
-                <div class="progress-bottom-border">
-                  <div class="progress-fill ${subject.status}" style="width: ${Math.min(subject.percentage, 100)}%"></div>
-                  <div class="progress-target"></div>
-                  <div class="attendance-percentage-text ${subject.status}">${subject.percentage.toFixed(1)}%</div>
-                </div>
-              </div>
-            `;
-          }).join('')}
+          <!-- Content will be populated by updateWidgetContent() -->
         </div>
       </div>
     `;
 
     document.body.appendChild(this.widget);
+    
+    // Recalculate data with current ML toggle state and update content
+    this.recalculateAttendanceData();
+    this.updateWidgetContent();
+    
     this.attachEventListeners();
     
     // Show widget after a brief delay
@@ -469,43 +453,31 @@ class AmritaAttendanceTracker {
     const closeBtn = this.widget.querySelector('#close-btn');
     const mlToggle = this.widget.querySelector('#ml-toggle');
 
-    mlToggle.addEventListener('change', async () => {
-      this.includeMedical = mlToggle.checked;
-      await this.saveMLToggleState();
-      
-      // Update data with smooth transition
-      const subjectsList = this.widget.querySelector('.subjects-list');
-      subjectsList.style.transition = 'opacity 0.3s ease';
-      subjectsList.style.opacity = '0';
-      
-      setTimeout(() => {
-        this.scrapeAttendanceData();
-        this.updateWidgetContent();
-        subjectsList.style.opacity = '1';
-        this.saveDataToStorage();
-      }, 300);
-    });
+    if (mlToggle) {
+      mlToggle.addEventListener('change', async () => {
+        this.includeMedical = mlToggle.checked;
+        await this.saveMLToggleState();
+        this.updateWithTransition();
+      });
+    }
 
-    refreshBtn.addEventListener('click', () => {
-      const subjectsList = this.widget.querySelector('.subjects-list');
-      subjectsList.style.transition = 'opacity 0.3s ease';
-      subjectsList.style.opacity = '0';
-      
-      setTimeout(() => {
-        this.scrapeAttendanceData();
-        this.updateWidgetContent();
-        subjectsList.style.opacity = '1';
-        this.saveDataToStorage();
-      }, 300);
-    });
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', () => {
+        this.updateWithTransition();
+      });
+    }
 
-    minimizeBtn.addEventListener('click', () => {
-      this.widget.classList.toggle('minimized');
-    });
+    if (minimizeBtn) {
+      minimizeBtn.addEventListener('click', () => {
+        this.widget.classList.toggle('minimized');
+      });
+    }
 
-    closeBtn.addEventListener('click', () => {
-      this.hideWidget();
-    });
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        this.hideWidget();
+      });
+    }
 
     this.makeDraggable();
   }
@@ -620,9 +592,30 @@ class AmritaAttendanceTracker {
     }
   }
 
-  updateWidgetContent() {
+  recalculateAttendanceData() {
+    // Recalculate attendance percentages and statuses for existing data
+    // This is needed when ML toggle state changes
+    this.tableData = this.tableData.map(subject => {
+      const effectivePresent = subject.present + subject.dutyLeave + (this.includeMedical ? subject.medical : 0);
+      const effectiveAttendance = (effectivePresent / subject.total) * 100;
+      
+      return {
+        ...subject,
+        percentage: effectiveAttendance,
+        status: this.getStatus(effectiveAttendance),
+        calculations: this.calculateScenarios(subject.total, subject.present, subject.dutyLeave, subject.medical, effectiveAttendance)
+      };
+    });
+  }
+
+  updateWidgetContent(skipRecalculation = false) {
     const subjectsList = this.widget.querySelector('.subjects-list');
     if (!subjectsList) return;
+
+    // Recalculate data with current ML toggle state before updating display
+    if (!skipRecalculation) {
+      this.recalculateAttendanceData();
+    }
 
     subjectsList.innerHTML = this.tableData.map(subject => {
       const bunkContent = this.getBunkContent(subject);
@@ -653,13 +646,32 @@ class AmritaAttendanceTracker {
     }).join('');
   }
 
-  saveDataToStorage() {
-    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-      chrome.storage.local.set({
-        attendanceData: this.tableData,
-        includeMedical: this.includeMedical,
-        lastUpdated: new Date().toISOString()
-      });
+  updateWithTransition() {
+    const subjectsList = this.widget.querySelector('.subjects-list');
+    if (!subjectsList) return;
+    
+    subjectsList.style.transition = 'opacity 0.3s ease';
+    subjectsList.style.opacity = '0';
+    
+    setTimeout(async () => {
+      this.scrapeAttendanceData();
+      this.updateWidgetContent(true); // Skip recalculation since scrapeAttendanceData() already did it
+      subjectsList.style.opacity = '1';
+      await this.saveDataToStorage();
+    }, 300);
+  }
+
+  async saveDataToStorage() {
+    try {
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        await chrome.storage.local.set({
+          attendanceData: this.tableData,
+          includeMedical: this.includeMedical,
+          lastUpdated: new Date().toISOString()
+        });
+      }
+    } catch (error) {
+      console.error('[AttendEase] Failed to save attendance data to storage:', error);
     }
   }
 }
