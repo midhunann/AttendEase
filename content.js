@@ -28,21 +28,26 @@ class AmritaAttendanceTracker {
   }
 
   async loadMLToggleState() {
-    return new Promise((resolve) => {
+    try {
       if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-        chrome.storage.local.get(['includeMedical'], (result) => {
-          this.includeMedical = result.includeMedical || false;
-          resolve();
-        });
-      } else {
-        resolve();
+        const result = await chrome.storage.local.get(['includeMedical']);
+        this.includeMedical = result.includeMedical || false;
+        console.log('[AttendEase] Loaded ML toggle state:', this.includeMedical);
       }
-    });
+    } catch (error) {
+      console.error('[AttendEase] Failed to load medical leave toggle state:', error);
+      this.includeMedical = false;
+    }
   }
 
   async saveMLToggleState() {
-    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-      await chrome.storage.local.set({ includeMedical: this.includeMedical });
+    try {
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        await chrome.storage.local.set({ includeMedical: this.includeMedical });
+        console.log('[AttendEase] Saved ML toggle state:', this.includeMedical);
+      }
+    } catch (error) {
+      console.error('[AttendEase] Failed to save medical leave toggle state:', error);
     }
   }
 
@@ -426,30 +431,7 @@ class AmritaAttendanceTracker {
       
       <div class="widget-content">
         <div class="subjects-list">
-          ${this.tableData.map(subject => {
-            const bunkContent = this.getBunkContent(subject);
-            
-            return `
-              <div class="subject-card status-${subject.status}">
-                <div class="subject-card-content">
-                  <div class="subject-left">
-                    <div class="course-code">${subject.serialNumber} | ${subject.courseCode}</div>
-                    <div class="course-name">${subject.courseName}</div>
-                    <div class="attendance-fraction">${subject.dutyLeave > 0 ? `${subject.present}+${subject.dutyLeave}` : subject.present}/${subject.total}</div>
-                    <div class="absent-count">${subject.absent} absent</div>
-                  </div>
-                  <div class="subject-right">
-                    ${bunkContent}
-                  </div>
-                </div>
-                <div class="progress-bottom-border">
-                  <div class="progress-fill ${subject.status}" style="width: ${Math.min(subject.percentage, 100)}%"></div>
-                  <div class="progress-target"></div>
-                  <div class="attendance-percentage-text ${subject.status}">${subject.percentage.toFixed(1)}%</div>
-                </div>
-              </div>
-            `;
-          }).join('')}
+          ${this.generateSubjectCards()}
         </div>
       </div>
     `;
@@ -469,34 +451,17 @@ class AmritaAttendanceTracker {
     const closeBtn = this.widget.querySelector('#close-btn');
     const mlToggle = this.widget.querySelector('#ml-toggle');
 
+    // Ensure the toggle state is properly synchronized
+    this.syncMLToggleState();
+
     mlToggle.addEventListener('change', async () => {
       this.includeMedical = mlToggle.checked;
       await this.saveMLToggleState();
-      
-      // Update data with smooth transition
-      const subjectsList = this.widget.querySelector('.subjects-list');
-      subjectsList.style.transition = 'opacity 0.3s ease';
-      subjectsList.style.opacity = '0';
-      
-      setTimeout(() => {
-        this.scrapeAttendanceData();
-        this.updateWidgetContent();
-        subjectsList.style.opacity = '1';
-        this.saveDataToStorage();
-      }, 300);
+      this.updateWithTransition();
     });
 
     refreshBtn.addEventListener('click', () => {
-      const subjectsList = this.widget.querySelector('.subjects-list');
-      subjectsList.style.transition = 'opacity 0.3s ease';
-      subjectsList.style.opacity = '0';
-      
-      setTimeout(() => {
-        this.scrapeAttendanceData();
-        this.updateWidgetContent();
-        subjectsList.style.opacity = '1';
-        this.saveDataToStorage();
-      }, 300);
+      this.updateWithTransition();
     });
 
     minimizeBtn.addEventListener('click', () => {
@@ -620,11 +585,8 @@ class AmritaAttendanceTracker {
     }
   }
 
-  updateWidgetContent() {
-    const subjectsList = this.widget.querySelector('.subjects-list');
-    if (!subjectsList) return;
-
-    subjectsList.innerHTML = this.tableData.map(subject => {
+  generateSubjectCards() {
+    return this.tableData.map(subject => {
       const bunkContent = this.getBunkContent(subject);
       const attendance = subject.dutyLeave > 0 ? 
         `${subject.present}+${subject.dutyLeave}${this.includeMedical && subject.medical > 0 ? '+' + subject.medical : ''}/${subject.total}` :
@@ -651,6 +613,36 @@ class AmritaAttendanceTracker {
         </div>
       `;
     }).join('');
+  }
+
+  updateWidgetContent() {
+    const subjectsList = this.widget.querySelector('.subjects-list');
+    if (!subjectsList) return;
+
+    subjectsList.innerHTML = this.generateSubjectCards();
+  }
+
+  updateWithTransition() {
+    const subjectsList = this.widget.querySelector('.subjects-list');
+    if (!subjectsList) return;
+
+    subjectsList.style.transition = 'opacity 0.3s ease';
+    subjectsList.style.opacity = '0';
+    
+    setTimeout(() => {
+      this.scrapeAttendanceData();
+      this.updateWidgetContent();
+      subjectsList.style.opacity = '1';
+      this.saveDataToStorage();
+    }, 300);
+  }
+
+  syncMLToggleState() {
+    const mlToggle = this.widget.querySelector('#ml-toggle');
+    if (mlToggle) {
+      mlToggle.checked = this.includeMedical;
+      console.log('[AttendEase] Synchronized ML toggle state:', this.includeMedical);
+    }
   }
 
   saveDataToStorage() {
