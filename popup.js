@@ -25,20 +25,18 @@ class PopupManager {
   }
 
   async loadStoredData() {
-    return new Promise((resolve) => {
+    try {
       if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-        chrome.storage.local.get(['attendanceData', 'lastUpdated', 'includeMedical'], (result) => {
-          if (result.attendanceData && result.attendanceData.length > 0) {
-            this.attendanceData = result.attendanceData;
-            this.includeMedical = result.includeMedical || false;
-            this.renderData();
-          }
-          resolve();
-        });
-      } else {
-        resolve();
+        const result = await chrome.storage.local.get(['attendanceData', 'lastUpdated', 'includeMedical']);
+        if (result.attendanceData && result.attendanceData.length > 0) {
+          this.attendanceData = result.attendanceData;
+          this.includeMedical = result.includeMedical || false;
+          this.renderData();
+        }
       }
-    });
+    } catch (error) {
+      console.error('[AttendEase Popup] Failed to load stored data:', error);
+    }
   }
 
   async requestDataFromContentScript() {
@@ -49,7 +47,9 @@ class PopupManager {
         throw new Error('Chrome APIs not available');
       }
 
-      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+      const tab = tabs[0];
+      
       console.log('[AttendEase Popup] Current tab:', tab?.url);
       
       if (!tab || !tab.url || !tab.url.includes('students.amrita.edu/client/class-attendance')) {
@@ -57,21 +57,30 @@ class PopupManager {
       }
 
       console.log('[AttendEase Popup] Sending message to content script...');
-      const response = await chrome.tabs.sendMessage(tab.id, { action: 'getAttendanceData' });
-      console.log('[AttendEase Popup] Response received:', response);
       
-      if (response && response.data && response.data.length > 0) {
-        console.log('[AttendEase Popup] Data received:', response.data.length, 'subjects');
-        this.attendanceData = response.data;
-        this.renderData();
-      } else if (this.attendanceData.length === 0) {
-        console.log('[AttendEase Popup] No data in response');
-        throw new Error('No data available');
+      try {
+        const response = await chrome.tabs.sendMessage(tab.id, { action: 'getAttendanceData' });
+        console.log('[AttendEase Popup] Response received:', response);
+        
+        if (response && response.data && response.data.length > 0) {
+          console.log('[AttendEase Popup] Data received:', response.data.length, 'subjects');
+          this.attendanceData = response.data;
+          this.renderData();
+        } else if (this.attendanceData.length === 0) {
+          console.log('[AttendEase Popup] No data in response');
+          throw new Error('No data available');
+        }
+      } catch (messageError) {
+        // Content script might not be loaded yet
+        console.log('[AttendEase Popup] Content script not responding:', messageError.message);
+        if (this.attendanceData.length === 0) {
+          throw new Error('Content script not loaded. Please refresh the page.');
+        }
       }
     } catch (error) {
       console.error('[AttendEase Popup] Error:', error);
       if (this.attendanceData.length === 0) {
-        this.showError();
+        this.showError(error.message);
       }
     }
   }
@@ -206,10 +215,18 @@ class PopupManager {
     document.getElementById('error').style.display = 'none';
   }
 
-  showError() {
+  showError(message = null) {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('content').style.display = 'none';
     document.getElementById('error').style.display = 'block';
+    
+    // Update error message if provided
+    if (message) {
+      const errorText = document.querySelector('#error p');
+      if (errorText) {
+        errorText.textContent = message;
+      }
+    }
     
     // Set up the go to attendance button listener
     this.setupGoToAttendanceListener();
