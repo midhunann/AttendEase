@@ -57,7 +57,15 @@ class PopupManager {
       }
 
       console.log('[AttendEase Popup] Sending message to content script...');
-      const response = await chrome.tabs.sendMessage(tab.id, { action: 'getAttendanceData' });
+      
+      // Add timeout and retry logic for the message
+      const response = await Promise.race([
+        chrome.tabs.sendMessage(tab.id, { action: 'getAttendanceData' }),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Message timeout')), 5000)
+        )
+      ]);
+      
       console.log('[AttendEase Popup] Response received:', response);
       
       if (response && response.data && response.data.length > 0) {

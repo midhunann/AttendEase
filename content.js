@@ -676,17 +676,28 @@ if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage)
     console.log('[AttendEase] Received message:', request);
     
     if (request.action === 'getAttendanceData') {
-      const tracker = window.attendanceTracker;
-      const data = tracker ? tracker.tableData : [];
-      console.log('[AttendEase] Sending data to popup:', data.length, 'subjects');
-      sendResponse({ data });
+      try {
+        const tracker = window.attendanceTracker;
+        const data = tracker ? tracker.tableData : [];
+        console.log('[AttendEase] Sending data to popup:', data.length, 'subjects');
+        sendResponse({ data });
+      } catch (error) {
+        console.error('[AttendEase] Error getting attendance data:', error);
+        sendResponse({ data: [] });
+      }
     } else if (request.action === 'toggleWidget') {
-      const tracker = window.attendanceTracker;
-      if (tracker) {
-        console.log('[AttendEase] Toggling widget');
-        tracker.toggleWidget();
+      try {
+        const tracker = window.attendanceTracker;
+        if (tracker) {
+          console.log('[AttendEase] Toggling widget');
+          tracker.toggleWidget();
+        }
+        sendResponse({ success: true });
+      } catch (error) {
+        console.error('[AttendEase] Error toggling widget:', error);
+        sendResponse({ success: false });
       }
     }
-    return true;
+    return true; // Keep the message channel open for async response
   });
 }
