@@ -36,6 +36,27 @@
             font-weight: 600;
             margin-bottom: 5px;
             letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .header h1 .divider {
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 300;
+        }
+
+        .header h1 .github-icon {
+            width: 18px;
+            height: 18px;
+            opacity: 0.9;
+            transition: opacity 0.2s ease;
+            cursor: pointer;
+        }
+
+        .header h1 .github-icon:hover {
+            opacity: 1;
         }
 
         .header p {
@@ -479,7 +500,13 @@
 <body>
     <div class="popup-container">
         <div class="header">
-            <h1>Amrita AttendEase</h1>
+            <h1>
+                Amrita AttendEase
+                <span class="divider">|</span>
+                <svg class="github-icon" width="18" height="18" xmlns="http://www.w3.org/2000/svg" onclick="window.open('https://github.com/midhunann/AttendEase', '_blank')">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M9 0C4.029 0 0 4.11 0 9.184c0 4.059 2.578 7.502 6.154 8.721.45.089.611-.198.611-.44 0-.213-.015-.943-.015-1.704-2.505.549-3.026-1.096-3.026-1.096-.402-1.065-1-.034-1.338-1.338-.831-.561.06-.561.06-.561.915.061 1.385.943 1.385.943.804 1.398 2.104 1.004 2.622.761.075-.593.315-1.004.57-1.232-2-.213-4.099-1.004-4.099-4.537 0-1.004.357-1.827.926-2.466-.09-.228-.402-1.171.09-2.438 0 0 .761-.243 2.476.943.72-.198 1.494-.304 2.252-.304.759 0 1.532.106 2.252.304 1.715-1.186 2.476-.943 2.476-.943.492 1.267.18 2.21.09 2.438.58.639.926 1.462.926 2.466 0 3.533-2.099 4.309-4.115 4.537.33.289.611.837.611 1.704 0 1.232-.015 2.222-.015 2.527 0 .243.165.532.611.441C15.421 16.686 18 13.243 18 9.184 18 4.11 13.971 0 9 0z" fill="#fff"/>
+                </svg>
+            </h1>
             <p>Up for a quick bunk check?</p>
         </div>
 
