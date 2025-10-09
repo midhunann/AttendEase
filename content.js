@@ -415,6 +415,10 @@ class AmritaAttendanceTracker {
       <div class="widget-header">
         <div class="widget-title">
           <span class="widget-icon">AttendEase</span>
+          <span class="divider">|</span>
+          <svg class="github-icon" width="16" height="16" xmlns="http://www.w3.org/2000/svg" onclick="window.open('https://github.com/midhunann/AttendEase', '_blank')">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M8 0C3.58 0 0 3.65 0 8.163c0 3.608 2.289 6.673 5.471 7.753.4.08.544-.176.544-.391 0-.19-.013-.84-.013-1.516-2.228.485-2.689-.976-2.689-.976-.357-.947-.89-1.198-.89-1.198-.726-.498.053-.498.053-.498.813.054 1.24.84 1.24.84.714 1.243 1.87.896 2.333.678.067-.528.28-.896.507-1.098-1.777-.189-3.646-.896-3.646-4.036 0-.896.318-1.626.826-2.195-.08-.203-.357-1.043.08-2.171 0 0 .677-.217 2.2.84.64-.176 1.327-.271 2.007-.271.677 0 1.366.095 2.007.271 1.523-1.057 2.2-.84 2.2-.84.437 1.128.16 1.968.08 2.171.508.569.826 1.299.826 2.195 0 3.14-1.869 3.833-3.656 4.036.294.257.544.744.544 1.516 0 1.098-.013 1.977-.013 2.248 0 .216.143.474.544.393C13.71 14.836 16 11.771 16 8.163 16 3.65 12.42 0 8 0z" fill="#fff"/>
+          </svg>
         </div>
         <div class="widget-controls">
           <div class="ml-toggle-container" title="Include Medical Leave">
@@ -489,8 +493,10 @@ class AmritaAttendanceTracker {
     header.style.cursor = 'move';
     
     header.addEventListener('mousedown', (e) => {
-      // Don't start dragging if clicking on control buttons
-      if (e.target.classList.contains('control-btn')) return;
+      // Don't start dragging if clicking on control buttons or GitHub icon
+      if (e.target.classList.contains('control-btn') || 
+          e.target.classList.contains('github-icon') ||
+          e.target.closest('.github-icon')) return;
       
       initialX = e.clientX - xOffset;
       initialY = e.clientY - yOffset;
