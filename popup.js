@@ -44,20 +44,20 @@ class PopupManager {
 
   async requestDataFromContentScript() {
     try {
-      console.log('[AttendEase Popup] Requesting data from content script...');
+      // console.log('[AttendEase Popup] Requesting data from content script...');
       
       if (typeof chrome === 'undefined' || !chrome.tabs) {
         throw new Error('Chrome APIs not available');
       }
 
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      console.log('[AttendEase Popup] Current tab:', tab?.url);
+      // console.log('[AttendEase Popup] Current tab:', tab?.url);
       
       if (!tab || !tab.url || !tab.url.includes('students.amrita.edu/client/class-attendance')) {
         throw new Error('Not on attendance page');
       }
 
-      console.log('[AttendEase Popup] Sending message to content script...');
+      // console.log('[AttendEase Popup] Sending message to content script...');
       
       // Add timeout and retry logic for the message
       const response = await Promise.race([
@@ -67,14 +67,14 @@ class PopupManager {
         )
       ]);
       
-      console.log('[AttendEase Popup] Response received:', response);
+      // console.log('[AttendEase Popup] Response received:', response);
       
       if (response && response.data && response.data.length > 0) {
-        console.log('[AttendEase Popup] Data received:', response.data.length, 'subjects');
+        // console.log('[AttendEase Popup] Data received:', response.data.length, 'subjects');
         this.attendanceData = response.data;
         this.renderData();
       } else if (this.attendanceData.length === 0) {
-        console.log('[AttendEase Popup] No data in response');
+        // console.log('[AttendEase Popup] No data in response');
         throw new Error('No data available');
       }
     } catch (error) {

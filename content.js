@@ -15,7 +15,7 @@ class AmritaAttendanceTracker {
   }
 
   init() {
-    console.log('[AttendEase] Content script initializing...');
+    // console.log('[AttendEase] Content script initializing...');
     
     // Load preferences (medical toggle and min attendance) from storage
     this.loadPreferences().then(() => {
@@ -33,7 +33,7 @@ class AmritaAttendanceTracker {
         const result = await chrome.storage.local.get(['includeMedical', 'minAttendance']);
         this.includeMedical = result.includeMedical || false;
         this.MIN_ATTENDANCE = result.minAttendance || 80;
-        console.log('[AttendEase] Loaded preferences - ML toggle:', this.includeMedical, 'Min Attendance:', this.MIN_ATTENDANCE);
+        // console.log('[AttendEase] Loaded preferences - ML toggle:', this.includeMedical, 'Min Attendance:', this.MIN_ATTENDANCE);
       }
     } catch (error) {
       console.error('[AttendEase] Failed to load preferences:', error);
@@ -46,7 +46,7 @@ class AmritaAttendanceTracker {
     try {
       if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
         await chrome.storage.local.set({ includeMedical: this.includeMedical });
-        console.log('[AttendEase] Saved ML toggle state:', this.includeMedical);
+        // console.log('[AttendEase] Saved ML toggle state:', this.includeMedical);
       }
     } catch (error) {
       console.error('[AttendEase] Failed to save medical leave toggle state:', error);
@@ -56,16 +56,16 @@ class AmritaAttendanceTracker {
   startTableDetection() {
     // Wait for table to load
     this.waitForTable().then(() => {
-      console.log('[AttendEase] Table found, scraping data...');
+      // console.log('[AttendEase] Table found, scraping data...');
       this.scrapeAttendanceData();
-      console.log('[AttendEase] Data scraped:', this.tableData.length, 'subjects');
+      // console.log('[AttendEase] Data scraped:', this.tableData.length, 'subjects');
       this.createFloatingWidget();
       this.saveDataToStorage();
     }).catch(error => {
       console.error('[AttendEase] Error during initialization:', error);
       // Fallback: try again after a longer delay
       setTimeout(() => {
-        console.log('[AttendEase] Retrying after delay...');
+        // console.log('[AttendEase] Retrying after delay...');
         this.startTableDetection();
       }, 5000);
     });
@@ -91,7 +91,7 @@ class AmritaAttendanceTracker {
       });
       
       if (shouldCheck && this.tableData.length === 0) {
-        console.log('[AttendEase] DOM changes detected, checking for attendance data...');
+        // console.log('[AttendEase] DOM changes detected, checking for attendance data...');
         setTimeout(() => {
           this.checkAndUpdateData();
         }, 1000);
@@ -122,7 +122,7 @@ class AmritaAttendanceTracker {
       });
       
       if (dataRows.length > 0 && this.tableData.length === 0) {
-        console.log('[AttendEase] New data detected, processing...');
+        // console.log('[AttendEase] New data detected, processing...');
         this.scrapeAttendanceData();
         if (this.tableData.length > 0) {
           this.createFloatingWidget();
@@ -139,7 +139,7 @@ class AmritaAttendanceTracker {
       
       const checkTable = () => {
         attempts++;
-        console.log(`[AttendEase] Looking for table, attempt ${attempts}/${maxAttempts}`);
+        // console.log(`[AttendEase] Looking for table, attempt ${attempts}/${maxAttempts}`);
         
         // Try multiple possible table selectors
         let table = document.getElementById('home_tab');
@@ -153,7 +153,7 @@ class AmritaAttendanceTracker {
                   document.querySelector('[id*="tab"] table');
         }
         
-        console.log('[AttendEase] Table element found:', !!table);
+        // console.log('[AttendEase] Table element found:', !!table);
         
         if (table) {
           // Check for data rows - be more flexible about the structure
@@ -166,11 +166,11 @@ class AmritaAttendanceTracker {
             return cells.length >= 5; // At least 5 columns for attendance data
           });
           
-          console.log('[AttendEase] Total rows found:', rows.length);
-          console.log('[AttendEase] Data rows with sufficient columns:', dataRows.length);
+          // console.log('[AttendEase] Total rows found:', rows.length);
+          // console.log('[AttendEase] Data rows with sufficient columns:', dataRows.length);
           
           if (dataRows.length > 0) {
-            console.log('[AttendEase] Table ready with data!');
+            // console.log('[AttendEase] Table ready with data!');
             // Store the table reference for later use
             this.attendanceTable = table;
             resolve();
@@ -180,10 +180,10 @@ class AmritaAttendanceTracker {
         
         if (attempts >= maxAttempts) {
           console.error('[AttendEase] Table not found after maximum attempts');
-          console.log('[AttendEase] Available tables on page:');
+          // console.log('[AttendEase] Available tables on page:');
           const allTables = document.querySelectorAll('table');
           allTables.forEach((t, i) => {
-            console.log(`Table ${i + 1}:`, t.id || t.className || 'no id/class', 'rows:', t.querySelectorAll('tr').length);
+            // console.log(`Table ${i + 1}:`, t.id || t.className || 'no id/class', 'rows:', t.querySelectorAll('tr').length);
           });
           reject(new Error('Table not found'));
           return;
@@ -207,7 +207,7 @@ class AmritaAttendanceTracker {
       return;
     }
 
-    console.log('[AttendEase] Using table:', table.id || table.className || 'unnamed table');
+    // console.log('[AttendEase] Using table:', table.id || table.className || 'unnamed table');
 
     // Get all rows - Amrita table structure has all rows directly under table
     const allRows = table.querySelectorAll('tr');
@@ -215,14 +215,14 @@ class AmritaAttendanceTracker {
     // Skip the first row (header row) and process data rows
     const rows = Array.from(allRows).slice(1);
 
-    console.log('[AttendEase] Found', rows.length, 'data rows to process');
+    // console.log('[AttendEase] Found', rows.length, 'data rows to process');
     
     this.tableData = [];
 
     rows.forEach((row, index) => {
       // Amrita uses th elements for all cells, not td
       const cells = row.querySelectorAll('th');
-      console.log(`[AttendEase] Row ${index + 1}: ${cells.length} cells`);
+      // console.log(`[AttendEase] Row ${index + 1}: ${cells.length} cells`);
       
       if (cells.length < 9) {
         console.warn(`[AttendEase] Row ${index + 1} has insufficient cells (${cells.length}), skipping`);
@@ -230,7 +230,7 @@ class AmritaAttendanceTracker {
       }
 
       // Log the cell contents to understand the structure
-      console.log(`[AttendEase] Row ${index + 1} cells:`, Array.from(cells).map((cell, i) => `${i}: "${cell.textContent.trim()}"`));
+      // console.log(`[AttendEase] Row ${index + 1} cells:`, Array.from(cells).map((cell, i) => `${i}: "${cell.textContent.trim()}"`));
 
       // Based on the table structure:
       // 0: Sl No, 1: Class Name, 2: Course (Code<br>Name), 3: Faculty, 
@@ -262,7 +262,7 @@ class AmritaAttendanceTracker {
 
       // Skip rows with zero total (like the LSE211-Grp1 row)
       if (total === 0) {
-        console.log(`[AttendEase] Skipping row ${index + 1}: ${courseCode} (zero total classes)`);
+        // console.log(`[AttendEase] Skipping row ${index + 1}: ${courseCode} (zero total classes)`);
         return;
       }
 
@@ -271,7 +271,7 @@ class AmritaAttendanceTracker {
       const effectiveAttendance = (effectivePresent / total) * 100;
       
       // Debug: Log the attendance calculation
-      console.log(`[AttendEase] ${courseCode}: Present=${present}, DutyLeave=${dutyLeave}, Medical=${medical}, Total=${total}, ML=${this.includeMedical}, Calculated=${effectiveAttendance.toFixed(1)}%`);
+      // console.log(`[AttendEase] ${courseCode}: Present=${present}, DutyLeave=${dutyLeave}, Medical=${medical}, Total=${total}, ML=${this.includeMedical}, Calculated=${effectiveAttendance.toFixed(1)}%`);
       
       const subjectData = {
         id: index,
@@ -290,11 +290,11 @@ class AmritaAttendanceTracker {
         calculations: this.calculateScenarios(total, present, dutyLeave, medical, effectiveAttendance)
       };
 
-      console.log(`[AttendEase] Processed subject:`, subjectData);
+      // console.log(`[AttendEase] Processed subject:`, subjectData);
       this.tableData.push(subjectData);
     });
     
-    console.log('[AttendEase] Final scraped data:', this.tableData);
+    // console.log('[AttendEase] Final scraped data:', this.tableData);
   }
 
   calculateScenarios(total, present, dutyLeave, medical, currentPercentage) {
@@ -676,7 +676,7 @@ class AmritaAttendanceTracker {
     const mlToggle = this.widget.querySelector('#ml-toggle');
     if (mlToggle) {
       mlToggle.checked = this.includeMedical;
-      console.log('[AttendEase] Synchronized ML toggle state:', this.includeMedical);
+      // console.log('[AttendEase] Synchronized ML toggle state:', this.includeMedical);
     }
   }
 
@@ -709,13 +709,13 @@ if (document.readyState === 'loading') {
 // Listen for messages from popup
 if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log('[AttendEase] Received message:', request);
+    // console.log('[AttendEase] Received message:', request);
     
     if (request.action === 'getAttendanceData') {
       try {
         const tracker = window.attendanceTracker;
         const data = tracker ? tracker.tableData : [];
-        console.log('[AttendEase] Sending data to popup:', data.length, 'subjects');
+        // console.log('[AttendEase] Sending data to popup:', data.length, 'subjects');
         sendResponse({ data });
       } catch (error) {
         console.error('[AttendEase] Error getting attendance data:', error);
@@ -725,7 +725,7 @@ if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage)
       try {
         const tracker = window.attendanceTracker;
         if (tracker) {
-          console.log('[AttendEase] Toggling widget');
+          // console.log('[AttendEase] Toggling widget');
           tracker.toggleWidget();
         }
         sendResponse({ success: true });
