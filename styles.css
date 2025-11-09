@@ -369,27 +369,11 @@
 
 .progress-target {
   position: absolute !important;
-  left: 75% !important;
   top: 0 !important;
   width: 1px !important;
   height: 100% !important;
   background: rgba(255,255,255,0.8) !important;
   z-index: 2 !important;
-}
-
-.progress-target::after {
-  content: '75%' !important;
-  position: absolute !important;
-  top: -16px !important;
-  left: -8px !important;
-  font-size: 8px !important;
-  color: #666 !important;
-  font-weight: 600 !important;
-  background: rgba(255,255,255,0.9) !important;
-  padding: 1px 3px !important;
-  border-radius: 2px !important;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
-  white-space: nowrap !important;
 }
 
 .attendance-percentage-text {

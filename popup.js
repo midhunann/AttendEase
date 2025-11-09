@@ -27,10 +27,11 @@ class PopupManager {
   async loadStoredData() {
     return new Promise((resolve) => {
       if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-        chrome.storage.local.get(['attendanceData', 'lastUpdated', 'includeMedical'], (result) => {
+        chrome.storage.local.get(['attendanceData', 'lastUpdated', 'includeMedical', 'minAttendance'], (result) => {
           if (result.attendanceData && result.attendanceData.length > 0) {
             this.attendanceData = result.attendanceData;
             this.includeMedical = result.includeMedical || false;
+            this.minAttendance = result.minAttendance || 80;
             this.renderData();
           }
           resolve();
@@ -103,6 +104,8 @@ class PopupManager {
       return;
     }
 
+    const minAttendance = this.minAttendance || 80;
+
     subjectList.innerHTML = this.attendanceData.map(subject => {
       const bunkContent = this.getBunkContent(subject);
       
@@ -121,7 +124,9 @@ class PopupManager {
           </div>
           <div class="progress-bottom-border">
             <div class="progress-fill ${subject.status}" style="width: ${Math.min(subject.percentage, 100)}%"></div>
-            <div class="progress-target"></div>
+            <div class="progress-target" style="left: ${minAttendance}%">
+              <span style="position: absolute; top: -16px; left: -12px; font-size: 8px; color: #666; font-weight: 600; background: rgba(255,255,255,0.9); padding: 1px 3px; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); white-space: nowrap;">${minAttendance}%</span>
+            </div>
             <div class="attendance-percentage-text ${subject.status}">${subject.percentage.toFixed(1)}%</div>
           </div>
         </div>

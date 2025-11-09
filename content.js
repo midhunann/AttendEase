@@ -5,7 +5,7 @@
 
 class AmritaAttendanceTracker {
   constructor() {
-    this.MIN_ATTENDANCE = 75;
+    this.MIN_ATTENDANCE = 80;
     this.tableData = [];
     this.widget = null;
     this.isWidgetVisible = false;
@@ -17,8 +17,8 @@ class AmritaAttendanceTracker {
   init() {
     console.log('[AttendEase] Content script initializing...');
     
-    // Load medical toggle state from storage
-    this.loadMLToggleState().then(() => {
+    // Load preferences (medical toggle and min attendance) from storage
+    this.loadPreferences().then(() => {
       // Start with immediate check
       this.startTableDetection();
       
@@ -27,16 +27,18 @@ class AmritaAttendanceTracker {
     });
   }
 
-  async loadMLToggleState() {
+  async loadPreferences() {
     try {
       if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-        const result = await chrome.storage.local.get(['includeMedical']);
+        const result = await chrome.storage.local.get(['includeMedical', 'minAttendance']);
         this.includeMedical = result.includeMedical || false;
-        console.log('[AttendEase] Loaded ML toggle state:', this.includeMedical);
+        this.MIN_ATTENDANCE = result.minAttendance || 80;
+        console.log('[AttendEase] Loaded preferences - ML toggle:', this.includeMedical, 'Min Attendance:', this.MIN_ATTENDANCE);
       }
     } catch (error) {
-      console.error('[AttendEase] Failed to load medical leave toggle state:', error);
+      console.error('[AttendEase] Failed to load preferences:', error);
       this.includeMedical = false;
+      this.MIN_ATTENDANCE = 80;
     }
   }
 
@@ -368,8 +370,9 @@ class AmritaAttendanceTracker {
   }
 
   getStatus(percentage) {
-    if (percentage >= 80) return 'safe';
-    if (percentage >= 75) return 'warning';
+    const warningThreshold = this.MIN_ATTENDANCE + 5;
+    if (percentage >= warningThreshold) return 'safe';
+    if (percentage >= this.MIN_ATTENDANCE) return 'warning';
     return 'danger';
   }
 
@@ -421,6 +424,15 @@ class AmritaAttendanceTracker {
           </svg>
         </div>
         <div class="widget-controls">
+          <div style="display: flex; align-items: center; gap: 6px; margin-right: 4px;">
+            <select id="widget-min-attendance" style="padding: 3px 6px; border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; background: rgba(255,255,255,0.15); color: #fff;">
+              <option value="75" style="color: #333;">75%</option>
+              <option value="80" style="color: #333;">80%</option>
+              <option value="85" style="color: #333;">85%</option>
+              <option value="90" style="color: #333;">90%</option>
+              <option value="95" style="color: #333;">95%</option>
+            </select>
+          </div>
           <div class="ml-toggle-container" title="Include Medical Leave">
             <input type="checkbox" id="ml-toggle" class="ml-toggle" ${this.includeMedical ? 'checked' : ''}>
             <label for="ml-toggle" class="ml-toggle-label">
@@ -454,9 +466,24 @@ class AmritaAttendanceTracker {
     const minimizeBtn = this.widget.querySelector('#minimize-btn');
     const closeBtn = this.widget.querySelector('#close-btn');
     const mlToggle = this.widget.querySelector('#ml-toggle');
+    const minAttendanceSelect = this.widget.querySelector('#widget-min-attendance');
 
     // Ensure the toggle state is properly synchronized
     this.syncMLToggleState();
+
+    if (minAttendanceSelect) {
+      minAttendanceSelect.value = this.MIN_ATTENDANCE;
+      minAttendanceSelect.addEventListener('change', async (e) => {
+        const newMinAttendance = parseInt(e.target.value);
+        this.MIN_ATTENDANCE = newMinAttendance;
+        
+        if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+          await chrome.storage.local.set({ minAttendance: newMinAttendance });
+        }
+        
+        this.updateWithTransition();
+      });
+    }
 
     mlToggle.addEventListener('change', async () => {
       this.includeMedical = mlToggle.checked;
@@ -613,7 +640,9 @@ class AmritaAttendanceTracker {
           </div>
           <div class="progress-bottom-border">
             <div class="progress-fill ${subject.status}" style="width: ${Math.min(subject.percentage, 100)}%"></div>
-            <div class="progress-target"></div>
+            <div class="progress-target" style="left: ${this.MIN_ATTENDANCE}%">
+              <span style="position: absolute; top: -16px; left: -12px; font-size: 8px; color: #666; font-weight: 600; background: rgba(255,255,255,0.9); padding: 1px 3px; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); white-space: nowrap;">${this.MIN_ATTENDANCE}%</span>
+            </div>
             <div class="attendance-percentage-text ${subject.status}">${subject.percentage.toFixed(1)}%</div>
           </div>
         </div>
@@ -656,6 +685,7 @@ class AmritaAttendanceTracker {
       chrome.storage.local.set({
         attendanceData: this.tableData,
         includeMedical: this.includeMedical,
+        minAttendance: this.MIN_ATTENDANCE,
         lastUpdated: new Date().toISOString()
       });
     }
