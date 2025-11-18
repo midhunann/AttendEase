@@ -5,7 +5,7 @@
 
 class AmritaAttendanceTracker {
   constructor() {
-    this.MIN_ATTENDANCE = 80;
+    this.MIN_ATTENDANCE = 75;
     this.tableData = [];
     this.widget = null;
     this.isWidgetVisible = false;
@@ -32,13 +32,13 @@ class AmritaAttendanceTracker {
       if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
         const result = await chrome.storage.local.get(['includeMedical', 'minAttendance']);
         this.includeMedical = result.includeMedical || false;
-        this.MIN_ATTENDANCE = result.minAttendance || 80;
+        this.MIN_ATTENDANCE = result.minAttendance || 75;
         // console.log('[AttendEase] Loaded preferences - ML toggle:', this.includeMedical, 'Min Attendance:', this.MIN_ATTENDANCE);
       }
     } catch (error) {
       console.error('[AttendEase] Failed to load preferences:', error);
       this.includeMedical = false;
-      this.MIN_ATTENDANCE = 80;
+      this.MIN_ATTENDANCE = 75;
     }
   }
 
