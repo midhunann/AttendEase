@@ -424,8 +424,8 @@ class AmritaAttendanceTracker {
           </svg>
         </div>
         <div class="widget-controls">
-          <div style="display: flex; align-items: center; gap: 6px; margin-right: 4px;">
-            <select id="widget-min-attendance" style="padding: 3px 6px; border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; background: rgba(255,255,255,0.15); color: #fff;">
+          <div class="min-attendance-container" title="Minimum Attendance Target">
+            <select id="widget-min-attendance" class="min-attendance-select">
               <option value="75" style="color: #333;">75%</option>
               <option value="80" style="color: #333;">80%</option>
               <option value="85" style="color: #333;">85%</option>
