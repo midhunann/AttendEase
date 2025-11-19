@@ -95,6 +95,56 @@
   height: 28px !important; /* Match the height of control buttons */
 }
 
+/* Min Attendance Dropdown */
+.min-attendance-container {
+  display: flex !important;
+  align-items: center !important;
+  position: relative !important;
+  height: 28px !important;
+}
+
+.min-attendance-select {
+  height: 28px !important;
+  padding: 0 8px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 14px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><path fill="white" opacity="0.9" d="M6 9L1 4h10z"/></svg>') !important;
+  background-repeat: no-repeat !important;
+  background-position: right 6px center !important;
+  background-size: 12px 12px !important;
+  color: #fff !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 1px 1px rgba(255, 255, 255, 0.1) !important;
+  transition: background-color 0.3s ease, border-color 0.3s ease !important;
+  outline: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  padding-right: 24px !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+.min-attendance-select:hover {
+  background-color: rgba(255, 255, 255, 0.3) !important;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><path fill="white" opacity="0.9" d="M6 9L1 4h10z"/></svg>') !important;
+  background-repeat: no-repeat !important;
+  background-position: right 6px center !important;
+  background-size: 12px 12px !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.min-attendance-select:focus {
+  background-color: rgba(255, 255, 255, 0.35) !important;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><path fill="white" opacity="0.9" d="M6 9L1 4h10z"/></svg>') !important;
+  background-repeat: no-repeat !important;
+  background-position: right 6px center !important;
+  background-size: 12px 12px !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
 /* ML Toggle Switch */
 .ml-toggle-container {
   display: flex !important;
@@ -110,7 +160,7 @@
 .ml-toggle-label {
   width: 56px !important;
   height: 28px !important;
-  background: rgba(255, 255, 255, 0.15) !important;
+  background: rgba(255, 255, 255, 0.2) !important;
   border-radius: 14px !important;
   cursor: pointer !important;
   position: relative !important;
@@ -122,6 +172,10 @@
   margin: 0 !important;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 1px 1px rgba(255, 255, 255, 0.1) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.ml-toggle-label:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
 }
 
 .ml-toggle-label::before {
@@ -369,27 +423,11 @@
 
 .progress-target {
   position: absolute !important;
-  left: 75% !important;
   top: 0 !important;
   width: 1px !important;
   height: 100% !important;
   background: rgba(255,255,255,0.8) !important;
   z-index: 2 !important;
-}
-
-.progress-target::after {
-  content: '75%' !important;
-  position: absolute !important;
-  top: -16px !important;
-  left: -8px !important;
-  font-size: 8px !important;
-  color: #666 !important;
-  font-weight: 600 !important;
-  background: rgba(255,255,255,0.9) !important;
-  padding: 1px 3px !important;
-  border-radius: 2px !important;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
-  white-space: nowrap !important;
 }
 
 .attendance-percentage-text {
