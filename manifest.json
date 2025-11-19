@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AttendEase",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Sleek attendance tracker for Amrita students—instantly shows your safe bunks.",
   "permissions": [
     "activeTab",
