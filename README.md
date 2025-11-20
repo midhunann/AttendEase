@@ -11,7 +11,8 @@ Maximize your bunks! Skip as many classes as possible while maintaining at least
 
 
 ---
-<img width="1470" alt="Screenshot 2025-07-04 at 17 54 08" src="https://github.com/user-attachments/assets/93710b42-0174-49ac-a378-80602afe1f2c" />
+<img width="1470" height="802" alt="image" src="https://github.com/user-attachments/assets/7f545c5d-0497-4c58-bb98-72ea77db85f0" />
+
 
 ---
 
