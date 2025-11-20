@@ -49,7 +49,7 @@
 .widget-header {
   background: linear-gradient(135deg, #bf0d4f 0%, #bf0d4f 100%) !important;
   color: white !important;
-  padding: 12px 16px !important;
+  padding: 12px 12px !important;
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
@@ -62,7 +62,7 @@
   align-items: center !important;
   font-weight: 600 !important;
   font-size: 16px !important;
-  gap: 8px !important;
+  gap: 6px !important;
 }
 
 .widget-icon {
@@ -73,7 +73,7 @@
 .widget-title .divider {
   color: rgba(255, 255, 255, 0.7) !important;
   font-weight: 300 !important;
-  margin: 0 4px !important;
+  margin: 0 2px !important;
 }
 
 .widget-title .github-icon {
@@ -90,9 +90,10 @@
 
 .widget-controls {
   display: flex !important;
-  gap: 8px !important;
+  gap: 4px !important;
   align-items: center !important;
-  height: 28px !important; /* Match the height of control buttons */
+  height: 28px !important;
+  /* Match the height of control buttons */
 }
 
 /* Min Attendance Dropdown */
@@ -150,7 +151,8 @@
   display: flex !important;
   align-items: center !important;
   position: relative !important;
-  height: 28px !important; /* Match the height of control buttons */
+  height: 28px !important;
+  /* Match the height of control buttons */
 }
 
 .ml-toggle {
@@ -158,7 +160,7 @@
 }
 
 .ml-toggle-label {
-  width: 56px !important;
+  width: 50px !important;
   height: 28px !important;
   background: rgba(255, 255, 255, 0.2) !important;
   border-radius: 14px !important;
@@ -171,7 +173,7 @@
   padding: 0 !important;
   margin: 0 !important;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 1px 1px rgba(255, 255, 255, 0.1) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
 }
 
 .ml-toggle-label:hover {
@@ -196,34 +198,34 @@
 }
 
 .ml-text {
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  color: rgba(255, 255, 255, 0.7) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: rgba(255, 255, 255, 0.8) !important;
   position: absolute !important;
-  right: 8px !important;
+  right: 6px !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   z-index: 2 !important;
   pointer-events: none !important;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
 }
 
-.ml-toggle:checked + .ml-toggle-label {
+.ml-toggle:checked+.ml-toggle-label {
   background: rgba(255, 255, 255, 0.9) !important;
   box-shadow: inset 0 1px 3px rgba(191, 13, 79, 0.2) !important;
 }
 
-.ml-toggle:checked + .ml-toggle-label::before {
-  transform: translateX(28px) !important;
+.ml-toggle:checked+.ml-toggle-label::before {
+  transform: translateX(22px) !important;
   background: #bf0d4f !important;
   box-shadow: 0 2px 4px rgba(191, 13, 79, 0.3) !important;
 }
 
-.ml-toggle:checked + .ml-toggle-label .ml-text {
+.ml-toggle:checked+.ml-toggle-label .ml-text {
   color: #bf0d4f !important;
-  right: 4px !important;
-  transform: translateX(-28px) !important;
+  right: 5px !important;
+  transform: translateX(-24px) !important;
   text-shadow: none !important;
-  font-weight: 700 !important;
+  font-weight: 800 !important;
 }
 
 .control-btn {
@@ -247,9 +249,9 @@
 
 /* Smooth transitions for subject cards */
 .subject-card {
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .subjects-list {
@@ -393,7 +395,7 @@
   justify-content: center !important;
   min-width: 70px !important;
   min-height: 50px !important;
-  background: rgba(255,255,255,0.8) !important;
+  background: rgba(255, 255, 255, 0.8) !important;
   border-radius: 6px !important;
   padding: 6px !important;
 }
@@ -402,7 +404,7 @@
 .progress-bottom-border {
   position: relative !important;
   height: 6px !important;
-  background: rgba(0,0,0,0.1) !important;
+  background: rgba(0, 0, 0, 0.1) !important;
   border-radius: 0 0 12px 12px !important;
   overflow: hidden !important;
   display: flex !important;
@@ -426,7 +428,7 @@
   top: 0 !important;
   width: 1px !important;
   height: 100% !important;
-  background: rgba(255,255,255,0.8) !important;
+  background: rgba(255, 255, 255, 0.8) !important;
   z-index: 2 !important;
 }
 
@@ -449,16 +451,18 @@
 }
 
 /* Color variations for progress bottom border */
-.progress-fill.safe { 
-  background: linear-gradient(90deg, #28a745, #20c997) !important; 
+.progress-fill.safe {
+  background: linear-gradient(90deg, #28a745, #20c997) !important;
   border-radius: 0 0 12px 12px !important;
 }
-.progress-fill.warning { 
-  background: linear-gradient(90deg, #ffc107, #fd7e14) !important; 
+
+.progress-fill.warning {
+  background: linear-gradient(90deg, #ffc107, #fd7e14) !important;
   border-radius: 0 0 12px 12px !important;
 }
-.progress-fill.danger { 
-  background: linear-gradient(90deg, #dc3545, #e91e63) !important; 
+
+.progress-fill.danger {
+  background: linear-gradient(90deg, #dc3545, #e91e63) !important;
   border-radius: 0 0 12px 12px !important;
 }
 
@@ -496,7 +500,7 @@
   min-height: 50px !important;
   width: 100% !important;
   border-radius: 6px !important;
-  background: rgba(255,255,255,0.9) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
   transition: all 0.2s ease !important;
 }
 
@@ -576,7 +580,7 @@
   font-weight: 700 !important;
   font-size: 24px !important;
   color: white !important;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
   border-radius: 8px !important;
   display: flex !important;
   align-items: center !important;
@@ -587,14 +591,16 @@
   min-width: 90px !important;
 }
 
-.attendance-percentage.safe { 
-  background: linear-gradient(135deg, #28a745, #20c997) !important; 
+.attendance-percentage.safe {
+  background: linear-gradient(135deg, #28a745, #20c997) !important;
 }
-.attendance-percentage.warning { 
-  background: linear-gradient(135deg, #ffc107, #ff8c00) !important; 
+
+.attendance-percentage.warning {
+  background: linear-gradient(135deg, #ffc107, #ff8c00) !important;
 }
-.attendance-percentage.danger { 
-  background: linear-gradient(135deg, #dc3545, #e91e63) !important; 
+
+.attendance-percentage.danger {
+  background: linear-gradient(135deg, #dc3545, #e91e63) !important;
 }
 
 /* Responsive Design */
@@ -613,6 +619,7 @@
     opacity: 0;
     transform: translate3d(400px, 0, 0);
   }
+
   to {
     opacity: 1;
     transform: translate3d(0, 0, 0);
@@ -632,9 +639,11 @@
   0% {
     box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
   }
+
   70% {
     box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
   }
+
   100% {
     box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
   }
@@ -645,7 +654,7 @@
   .amrita-widget {
     border: 2px solid #000 !important;
   }
-  
+
   .subject-card {
     border: 1px solid #666 !important;
   }
@@ -653,10 +662,205 @@
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
+
   .amrita-widget,
   .progress-fill,
   .control-btn,
   .subject-card {
     transition: none !important;
   }
+}
+
+/* Simulator Toggle Switch */
+.sim-toggle-container {
+  display: flex !important;
+  align-items: center !important;
+  position: relative !important;
+  height: 28px !important;
+}
+
+.sim-toggle {
+  display: none !important;
+}
+
+.sim-toggle-label {
+  width: 50px !important;
+  height: 28px !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-radius: 14px !important;
+  cursor: pointer !important;
+  position: relative !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 1px 1px rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.sim-toggle-label:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+
+.sim-toggle-label::before {
+  content: '' !important;
+  position: absolute !important;
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(to bottom, #ffffff, #f0f0f0) !important;
+  top: 1px !important;
+  left: 1px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), inset 0 1px 1px #fff !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+.sim-text {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  position: absolute !important;
+  right: 6px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  z-index: 2 !important;
+  pointer-events: none !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+.sim-toggle:checked+.sim-toggle-label {
+  background: rgba(255, 255, 255, 0.9) !important;
+  box-shadow: inset 0 1px 3px rgba(33, 150, 243, 0.2) !important;
+}
+
+.sim-toggle:checked+.sim-toggle-label::before {
+  transform: translateX(22px) !important;
+  background: #2196f3 !important;
+  box-shadow: 0 2px 4px rgba(33, 150, 243, 0.3) !important;
+}
+
+.sim-toggle:checked+.sim-toggle-label .sim-text {
+  color: #2196f3 !important;
+  right: 5px !important;
+  transform: translateX(-24px) !important;
+  text-shadow: none !important;
+  font-weight: 800 !important;
+}
+
+/* Simulator Controls in Card */
+.sim-controls {
+  display: flex !important;
+  gap: 8px !important;
+  margin-top: 6px !important;
+  padding-top: 6px !important;
+  border-top: 1px dashed rgba(0, 0, 0, 0.1) !important;
+}
+
+.sim-control-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  background: rgba(0, 0, 0, 0.03) !important;
+  padding: 2px 4px !important;
+  border-radius: 4px !important;
+}
+
+.sim-label {
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  color: #666 !important;
+  text-transform: uppercase !important;
+  margin-right: 2px !important;
+}
+
+.sim-btn {
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 4px !important;
+  border: none !important;
+  background: #fff !important;
+  color: #333 !important;
+  font-weight: 700 !important;
+  font-size: 12px !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.2s ease !important;
+  padding: 0 !important;
+}
+
+.sim-btn:hover {
+  background: #f0f0f0 !important;
+  transform: translateY(-1px) !important;
+}
+
+.sim-btn:active {
+  transform: translateY(0) !important;
+}
+
+.sim-btn.plus {
+  color: #28a745 !important;
+}
+
+.sim-btn.minus {
+  color: #dc3545 !important;
+}
+
+.sim-count {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #333 !important;
+  min-width: 14px !important;
+  text-align: center !important;
+}
+
+/* Simulation Mode Visual Cue */
+.subject-card.simulation-mode {
+  border-style: dashed !important;
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(33, 150, 243, 0.03) 10px, rgba(33, 150, 243, 0.03) 20px) !important;
+}
+
+/* Percentage Badge in Header */
+.percentage-badge {
+  display: inline-block !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: white !important;
+  margin-right: 6px !important;
+  min-width: 40px !important;
+  text-align: center !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+.percentage-badge.safe {
+  background: #28a745 !important;
+}
+
+.percentage-badge.warning {
+  background: #ffc107 !important;
+  color: #333 !important;
+}
+
+.percentage-badge.danger {
+  background: #dc3545 !important;
+}
+
+.code-text {
+  color: #333 !important;
+  font-weight: 600 !important;
+}
+
+.course-code {
+  display: flex !important;
+  align-items: center !important;
 }

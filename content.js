@@ -10,18 +10,22 @@ class AmritaAttendanceTracker {
     this.widget = null;
     this.isWidgetVisible = false;
     this.includeMedical = false; // Initialize medical leave toggle state
-    
+
+    // Simulation Mode State
+    this.isSimulationMode = false;
+    this.simulationChanges = {}; // Stores delta: { subjectId: { attended: 0, missed: 0 } }
+
     this.init();
   }
 
   init() {
     // console.log('[AttendEase] Content script initializing...');
-    
+
     // Load preferences (medical toggle and min attendance) from storage
     this.loadPreferences().then(() => {
       // Start with immediate check
       this.startTableDetection();
-      
+
       // Also set up a MutationObserver to watch for dynamic content loading
       this.setupMutationObserver();
     });
@@ -75,21 +79,21 @@ class AmritaAttendanceTracker {
     // Watch for changes in the DOM that might indicate data loading
     const observer = new MutationObserver((mutations) => {
       let shouldCheck = false;
-      
+
       mutations.forEach((mutation) => {
         if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
           // Check if any added nodes contain table data
           mutation.addedNodes.forEach((node) => {
             if (node.nodeType === 1) { // Element node
-              if (node.tagName === 'TR' || node.querySelector('tr') || 
-                  node.tagName === 'TABLE' || node.querySelector('table')) {
+              if (node.tagName === 'TR' || node.querySelector('tr') ||
+                node.tagName === 'TABLE' || node.querySelector('table')) {
                 shouldCheck = true;
               }
             }
           });
         }
       });
-      
+
       if (shouldCheck && this.tableData.length === 0) {
         // console.log('[AttendEase] DOM changes detected, checking for attendance data...');
         setTimeout(() => {
@@ -107,11 +111,11 @@ class AmritaAttendanceTracker {
 
   checkAndUpdateData() {
     // Quick check if we now have data
-    const table = document.getElementById('home_tab') || 
-                  document.querySelector('table[class*="attendance"]') ||
-                  document.querySelector('table.table') ||
-                  document.querySelector('.table-responsive table');
-                  
+    const table = document.getElementById('home_tab') ||
+      document.querySelector('table[class*="attendance"]') ||
+      document.querySelector('table.table') ||
+      document.querySelector('.table-responsive table');
+
     if (table) {
       const rows = table.querySelectorAll('tr');
       const dataRows = Array.from(rows).filter((row, index) => {
@@ -120,7 +124,7 @@ class AmritaAttendanceTracker {
         const cells = row.querySelectorAll('td, th');
         return cells.length >= 5;
       });
-      
+
       if (dataRows.length > 0 && this.tableData.length === 0) {
         // console.log('[AttendEase] New data detected, processing...');
         this.scrapeAttendanceData();
@@ -136,25 +140,25 @@ class AmritaAttendanceTracker {
     return new Promise((resolve, reject) => {
       let attempts = 0;
       const maxAttempts = 40; // 20 seconds max (increased timeout)
-      
+
       const checkTable = () => {
         attempts++;
         // console.log(`[AttendEase] Looking for table, attempt ${attempts}/${maxAttempts}`);
-        
+
         // Try multiple possible table selectors
         let table = document.getElementById('home_tab');
-        
+
         // If home_tab doesn't exist, try other common table IDs/classes
         if (!table) {
           table = document.querySelector('table[class*="attendance"]') ||
-                  document.querySelector('table.table') ||
-                  document.querySelector('.table-responsive table') ||
-                  document.querySelector('#attendance_table') ||
-                  document.querySelector('[id*="tab"] table');
+            document.querySelector('table.table') ||
+            document.querySelector('.table-responsive table') ||
+            document.querySelector('#attendance_table') ||
+            document.querySelector('[id*="tab"] table');
         }
-        
+
         // console.log('[AttendEase] Table element found:', !!table);
-        
+
         if (table) {
           // Check for data rows - be more flexible about the structure
           // Amrita uses th elements for all cells, not just headers
@@ -165,10 +169,10 @@ class AmritaAttendanceTracker {
             const cells = row.querySelectorAll('td, th');
             return cells.length >= 5; // At least 5 columns for attendance data
           });
-          
+
           // console.log('[AttendEase] Total rows found:', rows.length);
           // console.log('[AttendEase] Data rows with sufficient columns:', dataRows.length);
-          
+
           if (dataRows.length > 0) {
             // console.log('[AttendEase] Table ready with data!');
             // Store the table reference for later use
@@ -177,7 +181,7 @@ class AmritaAttendanceTracker {
             return;
           }
         }
-        
+
         if (attempts >= maxAttempts) {
           console.error('[AttendEase] Table not found after maximum attempts');
           // console.log('[AttendEase] Available tables on page:');
@@ -188,7 +192,7 @@ class AmritaAttendanceTracker {
           reject(new Error('Table not found'));
           return;
         }
-        
+
         setTimeout(checkTable, 500);
       };
       checkTable();
@@ -197,11 +201,11 @@ class AmritaAttendanceTracker {
 
   scrapeAttendanceData() {
     // Use the table we found in waitForTable, or try to find it again
-    const table = this.attendanceTable || document.getElementById('home_tab') || 
-                  document.querySelector('table[class*="attendance"]') ||
-                  document.querySelector('table.table') ||
-                  document.querySelector('.table-responsive table');
-                  
+    const table = this.attendanceTable || document.getElementById('home_tab') ||
+      document.querySelector('table[class*="attendance"]') ||
+      document.querySelector('table.table') ||
+      document.querySelector('.table-responsive table');
+
     if (!table) {
       console.error('[AttendEase] Table not found during scraping');
       return;
@@ -211,19 +215,19 @@ class AmritaAttendanceTracker {
 
     // Get all rows - Amrita table structure has all rows directly under table
     const allRows = table.querySelectorAll('tr');
-    
+
     // Skip the first row (header row) and process data rows
     const rows = Array.from(allRows).slice(1);
 
     // console.log('[AttendEase] Found', rows.length, 'data rows to process');
-    
+
     this.tableData = [];
 
     rows.forEach((row, index) => {
       // Amrita uses th elements for all cells, not td
       const cells = row.querySelectorAll('th');
       // console.log(`[AttendEase] Row ${index + 1}: ${cells.length} cells`);
-      
+
       if (cells.length < 9) {
         console.warn(`[AttendEase] Row ${index + 1} has insufficient cells (${cells.length}), skipping`);
         return;
@@ -235,7 +239,7 @@ class AmritaAttendanceTracker {
       // Based on the table structure:
       // 0: Sl No, 1: Class Name, 2: Course (Code<br>Name), 3: Faculty, 
       // 4: Total, 5: Present, 6: Duty Leave, 7: Absent, 8: Percentage, 9: Medical
-      
+
       const slNo = cells[0].textContent.trim();
       const className = cells[1].textContent.trim();
       const courseInfo = cells[2].innerHTML; // Contains course code and name
@@ -250,7 +254,7 @@ class AmritaAttendanceTracker {
       // Extract course code and name from the course info cell
       let courseCode = '';
       let courseName = '';
-      
+
       if (courseInfo.includes('<br>')) {
         const parts = courseInfo.split('<br>');
         courseCode = parts[0].trim();
@@ -269,10 +273,10 @@ class AmritaAttendanceTracker {
       // Calculate effective attendance including medical leave if toggle is on
       const effectivePresent = present + dutyLeave + (this.includeMedical ? medical : 0);
       const effectiveAttendance = (effectivePresent / total) * 100;
-      
+
       // Debug: Log the attendance calculation
       // console.log(`[AttendEase] ${courseCode}: Present=${present}, DutyLeave=${dutyLeave}, Medical=${medical}, Total=${total}, ML=${this.includeMedical}, Calculated=${effectiveAttendance.toFixed(1)}%`);
-      
+
       const subjectData = {
         id: index,
         serialNumber: slNo,
@@ -293,7 +297,7 @@ class AmritaAttendanceTracker {
       // console.log(`[AttendEase] Processed subject:`, subjectData);
       this.tableData.push(subjectData);
     });
-    
+
     // console.log('[AttendEase] Final scraped data:', this.tableData);
   }
 
@@ -325,11 +329,11 @@ class AmritaAttendanceTracker {
       // Calculate how many classes can be bunked while maintaining 75%
       let canBunk = 0;
       let testTotal = total;
-      
+
       while (canBunk < 1000) { // Safety limit
         testTotal++; // Test bunking one more class
         const newPercentage = (effectivePresent / testTotal) * 100;
-        
+
         if (newPercentage >= this.MIN_ATTENDANCE) {
           canBunk++;
         } else {
@@ -338,7 +342,7 @@ class AmritaAttendanceTracker {
       }
 
       results.canBunk = Math.max(0, canBunk);
-      results.message = results.canBunk > 0 
+      results.message = results.canBunk > 0
         ? `You can bunk ${results.canBunk} more classes and stay ≥75%`
         : 'Cannot bunk any more classes';
     } else {
@@ -439,6 +443,12 @@ class AmritaAttendanceTracker {
               <span class="ml-text">ML</span>
             </label>
           </div>
+          <div class="sim-toggle-container" title="Toggle Simulator Mode">
+            <input type="checkbox" id="sim-toggle" class="sim-toggle" ${this.isSimulationMode ? 'checked' : ''}>
+            <label for="sim-toggle" class="sim-toggle-label">
+              <span class="sim-text">SIM</span>
+            </label>
+          </div>
           <button id="refresh-btn" class="control-btn" title="Refresh Data">↻</button>
           <button id="minimize-btn" class="control-btn" title="Minimize">−</button>
           <button id="close-btn" class="control-btn" title="Close">×</button>
@@ -454,7 +464,7 @@ class AmritaAttendanceTracker {
 
     document.body.appendChild(this.widget);
     this.attachEventListeners();
-    
+
     // Show widget after a brief delay
     setTimeout(() => {
       this.showWidget();
@@ -476,11 +486,11 @@ class AmritaAttendanceTracker {
       minAttendanceSelect.addEventListener('change', async (e) => {
         const newMinAttendance = parseInt(e.target.value);
         this.MIN_ATTENDANCE = newMinAttendance;
-        
+
         if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
           await chrome.storage.local.set({ minAttendance: newMinAttendance });
         }
-        
+
         this.updateWithTransition();
       });
     }
@@ -489,6 +499,37 @@ class AmritaAttendanceTracker {
       this.includeMedical = mlToggle.checked;
       await this.saveMLToggleState();
       this.updateWithTransition();
+    });
+
+    const simToggle = this.widget.querySelector('#sim-toggle');
+    if (simToggle) {
+      simToggle.addEventListener('change', () => {
+        this.isSimulationMode = simToggle.checked;
+        this.simulationChanges = {}; // Reset changes on toggle
+        this.updateWithTransition();
+      });
+    }
+
+    // Delegated listener for simulator buttons
+    this.widget.addEventListener('click', (e) => {
+      if (e.target.classList.contains('sim-btn')) {
+        const btn = e.target;
+        const id = parseInt(btn.dataset.id);
+        const type = btn.dataset.type; // 'attended' or 'missed'
+        const isPlus = btn.classList.contains('plus');
+
+        if (!this.simulationChanges[id]) {
+          this.simulationChanges[id] = { attended: 0, missed: 0 };
+        }
+
+        if (isPlus) {
+          this.simulationChanges[id][type]++;
+        } else {
+          this.simulationChanges[id][type]--;
+        }
+
+        this.updateWidgetContent();
+      }
     });
 
     refreshBtn.addEventListener('click', () => {
@@ -518,13 +559,13 @@ class AmritaAttendanceTracker {
 
     // Add visual feedback for draggable area
     header.style.cursor = 'move';
-    
+
     header.addEventListener('mousedown', (e) => {
       // Don't start dragging if clicking on control buttons or GitHub icon
-      if (e.target.classList.contains('control-btn') || 
-          e.target.classList.contains('github-icon') ||
-          e.target.closest('.github-icon')) return;
-      
+      if (e.target.classList.contains('control-btn') ||
+        e.target.classList.contains('github-icon') ||
+        e.target.closest('.github-icon')) return;
+
       initialX = e.clientX - xOffset;
       initialY = e.clientY - yOffset;
 
@@ -532,7 +573,7 @@ class AmritaAttendanceTracker {
         isDragging = true;
         header.style.cursor = 'grabbing';
         this.widget.style.zIndex = '1000000'; // Bring to front while dragging
-        
+
         // Add dragging class for visual feedback
         this.widget.classList.add('dragging');
       }
@@ -543,15 +584,15 @@ class AmritaAttendanceTracker {
         e.preventDefault();
         currentX = e.clientX - initialX;
         currentY = e.clientY - initialY;
-        
+
         // Keep widget within viewport bounds
         const rect = this.widget.getBoundingClientRect();
         const maxX = window.innerWidth - rect.width;
         const maxY = window.innerHeight - rect.height;
-        
+
         currentX = Math.max(0, Math.min(currentX, maxX));
         currentY = Math.max(0, Math.min(currentY, maxY));
-        
+
         xOffset = currentX;
         yOffset = currentY;
 
@@ -566,10 +607,10 @@ class AmritaAttendanceTracker {
         isDragging = false;
         header.style.cursor = 'move';
         this.widget.style.zIndex = '999999'; // Reset z-index
-        
+
         // Remove dragging class
         this.widget.classList.remove('dragging');
-        
+
         // Save position to localStorage for persistence
         this.saveWidgetPosition(currentX, currentY);
       }
@@ -618,32 +659,80 @@ class AmritaAttendanceTracker {
     }
   }
 
+  calculateProjectedStatus(subject, changes) {
+    const newPresent = subject.present + changes.attended;
+    const newAbsent = subject.absent + changes.missed;
+    const newTotal = subject.total + changes.attended + changes.missed;
+
+    // Recalculate percentage
+    const effectivePresent = newPresent + subject.dutyLeave + (this.includeMedical ? subject.medical : 0);
+    const newPercentage = (effectivePresent / newTotal) * 100;
+
+    return {
+      ...subject,
+      present: newPresent,
+      absent: newAbsent,
+      total: newTotal,
+      percentage: newPercentage,
+      status: this.getStatus(newPercentage),
+      calculations: this.calculateScenarios(newTotal, newPresent, subject.dutyLeave, subject.medical, newPercentage)
+    };
+  }
+
   generateSubjectCards() {
     return this.tableData.map(subject => {
-      const bunkContent = this.getBunkContent(subject);
-      const attendance = subject.dutyLeave > 0 ? 
-        `${subject.present}+${subject.dutyLeave}${this.includeMedical && subject.medical > 0 ? '+' + subject.medical : ''}/${subject.total}` :
-        `${subject.present}${this.includeMedical && subject.medical > 0 ? '+' + subject.medical : ''}/${subject.total}`;
-      
+      let displaySubject = subject;
+      let simControls = '';
+
+      if (this.isSimulationMode) {
+        const changes = this.simulationChanges[subject.id] || { attended: 0, missed: 0 };
+        displaySubject = this.calculateProjectedStatus(subject, changes);
+
+        simControls = `
+          <div class="sim-controls">
+            <div class="sim-control-group">
+              <span class="sim-label">Attend</span>
+              <button class="sim-btn minus" data-id="${subject.id}" data-type="attended">−</button>
+              <span class="sim-count">${changes.attended}</span>
+              <button class="sim-btn plus" data-id="${subject.id}" data-type="attended">+</button>
+            </div>
+            <div class="sim-control-group">
+              <span class="sim-label">Miss</span>
+              <button class="sim-btn minus" data-id="${subject.id}" data-type="missed">−</button>
+              <span class="sim-count">${changes.missed}</span>
+              <button class="sim-btn plus" data-id="${subject.id}" data-type="missed">+</button>
+            </div>
+          </div>
+        `;
+      }
+
+      const bunkContent = this.getBunkContent(displaySubject);
+      const attendance = displaySubject.dutyLeave > 0 ?
+        `${displaySubject.present}+${displaySubject.dutyLeave}${this.includeMedical && displaySubject.medical > 0 ? '+' + displaySubject.medical : ''}/${displaySubject.total}` :
+        `${displaySubject.present}${this.includeMedical && displaySubject.medical > 0 ? '+' + displaySubject.medical : ''}/${displaySubject.total}`;
+
       return `
-        <div class="subject-card status-${subject.status}">
+        <div class="subject-card status-${displaySubject.status} ${this.isSimulationMode ? 'simulation-mode' : ''}">
           <div class="subject-card-content">
             <div class="subject-left">
-              <div class="course-code">${subject.serialNumber} | ${subject.courseCode}</div>
-              <div class="course-name">${subject.courseName}</div>
+              <div class="course-code">
+                <span class="percentage-badge ${displaySubject.status}">${displaySubject.percentage.toFixed(1)}%</span>
+                <span class="code-text">${displaySubject.courseCode}</span>
+              </div>
+              <div class="course-name">${displaySubject.courseName}</div>
               <div class="attendance-fraction">${attendance}</div>
-              <div class="absent-count">${subject.absent} absent</div>
+              <div class="absent-count">${displaySubject.absent} absent</div>
+              ${simControls}
             </div>
             <div class="subject-right">
               ${bunkContent}
             </div>
           </div>
           <div class="progress-bottom-border">
-            <div class="progress-fill ${subject.status}" style="width: ${Math.min(subject.percentage, 100)}%"></div>
+            <div class="progress-fill ${displaySubject.status}" style="width: ${Math.min(displaySubject.percentage, 100)}%"></div>
             <div class="progress-target" style="left: ${this.MIN_ATTENDANCE}%">
               <span style="position: absolute; top: -16px; left: -12px; font-size: 8px; color: #666; font-weight: 600; background: rgba(255,255,255,0.9); padding: 1px 3px; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); white-space: nowrap;">${this.MIN_ATTENDANCE}%</span>
             </div>
-            <div class="attendance-percentage-text ${subject.status}">${subject.percentage.toFixed(1)}%</div>
           </div>
         </div>
       `;
@@ -663,7 +752,7 @@ class AmritaAttendanceTracker {
 
     subjectsList.style.transition = 'opacity 0.3s ease';
     subjectsList.style.opacity = '0';
-    
+
     setTimeout(() => {
       this.scrapeAttendanceData();
       this.updateWidgetContent();
@@ -710,7 +799,7 @@ if (document.readyState === 'loading') {
 if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     // console.log('[AttendEase] Received message:', request);
-    
+
     if (request.action === 'getAttendanceData') {
       try {
         const tracker = window.attendanceTracker;
