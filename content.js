@@ -5,12 +5,12 @@
 
 class AmritaAttendanceTracker {
   constructor() {
-    this.MIN_ATTENDANCE = 75;
+    this.MIN_ATTENDANCE = 80;
     this.tableData = [];
     this.widget = null;
     this.isWidgetVisible = false;
     this.includeMedical = false; // Initialize medical leave toggle state
-    
+
     this.init();
   }
 
@@ -32,13 +32,13 @@ class AmritaAttendanceTracker {
       if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
         const result = await chrome.storage.local.get(['includeMedical', 'minAttendance']);
         this.includeMedical = result.includeMedical || false;
-        this.MIN_ATTENDANCE = result.minAttendance || 75;
+        this.MIN_ATTENDANCE = result.minAttendance || 80;
         // console.log('[AttendEase] Loaded preferences - ML toggle:', this.includeMedical, 'Min Attendance:', this.MIN_ATTENDANCE);
       }
     } catch (error) {
       console.error('[AttendEase] Failed to load preferences:', error);
       this.includeMedical = false;
-      this.MIN_ATTENDANCE = 75;
+      this.MIN_ATTENDANCE = 80;
     }
   }
 
@@ -322,7 +322,7 @@ class AmritaAttendanceTracker {
     const actualPercentage = (effectivePresent / total) * 100;
 
     if (actualPercentage >= this.MIN_ATTENDANCE) {
-      // Calculate how many classes can be bunked while maintaining 75%
+      // Calculate how many classes can be bunked while maintaining 80%
       let canBunk = 0;
       let testTotal = total;
       
@@ -338,11 +338,11 @@ class AmritaAttendanceTracker {
       }
 
       results.canBunk = Math.max(0, canBunk);
-      results.message = results.canBunk > 0 
-        ? `You can bunk ${results.canBunk} more classes and stay ≥75%`
+      results.message = results.canBunk > 0
+        ? `You can bunk ${results.canBunk} more classes and stay ≥80%`
         : 'Cannot bunk any more classes';
     } else {
-      // Calculate how many classes needed to reach 75%
+      // Calculate how many classes needed to reach 80%
       let needToAttend = 0;
       let futureTotal = total;
       let futureEffectivePresent = effectivePresent;
@@ -359,7 +359,7 @@ class AmritaAttendanceTracker {
 
       // Use the more conservative result
       results.needToAttend = Math.max(needToAttend, minAttendMath, 0);
-      results.message = `Attend ${results.needToAttend} consecutive classes to reach 75%`;
+      results.message = `Attend ${results.needToAttend} consecutive classes to reach 80%`;
     }
 
     // Additional safety checks
