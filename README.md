@@ -1,5 +1,5 @@
-# ![AttendEase Logo](attend-ease-48.png) AttendEase 
-Maximize your bunks! Skip as many classes as possible while maintaining at least 75% attendance.
+# ![AttendEase Logo](attend-ease-48.png) AttendEase
+Maximize your bunks! Skip as many classes as possible while maintaining at least 80% attendance.
 
 
 
@@ -32,8 +32,8 @@ Maximize your bunks! Skip as many classes as possible while maintaining at least
 
 **AttendEase** is a browser extension designed for Amrita University students. It automatically scrapes attendance data from the official student portal and provides:
 
-* **Bunkable Classes**: Maximum lectures you can skip while maintaining at least 75% attendance.
-* **Recovery Classes**: Minimum lectures you need to attend if you’re below the threshold.
+* **Bunkable Classes**: Maximum lectures you can skip while maintaining at least 80% attendance.
+* **Recovery Classes**: Minimum lectures you need to attend if you're below the threshold.
 
 Access real-time stats through a floating widget or via the extension popup—no manual entry needed.
 
@@ -75,8 +75,8 @@ In my first year, I built a simple HTML/CSS/JS tool with my friend [Hemanth](htt
 <summary>3. Calculations</summary>
 
 * Attendance % = `(present + dutyLeave) / totalClasses * 100`
-* Bunkable: Max classes you can skip to stay at or above 75%.
-* Recovery: Classes needed to reach 75% if below threshold.
+* Bunkable: Max classes you can skip to stay at or above 80%.
+* Recovery: Classes needed to reach 80% if below threshold.
 
 </details>
 
@@ -86,9 +86,9 @@ In my first year, I built a simple HTML/CSS/JS tool with my friend [Hemanth](htt
 * Floating Widget: Draggable, collapsible, remembers its position in `localStorage`.
 * Extension Popup: Card-based summary with color codes:
 
-  * Safe (75% or above)
-  * Warning (70–75%)
-  * Danger (below 70%)
+  * Safe (80% or above)
+  * Warning (75–80%)
+  * Danger (below 75%)
 
 </details>
 

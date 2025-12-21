@@ -31,7 +31,7 @@ class PopupManager {
           if (result.attendanceData && result.attendanceData.length > 0) {
             this.attendanceData = result.attendanceData;
             this.includeMedical = result.includeMedical || false;
-            this.minAttendance = result.minAttendance || 75;
+            this.minAttendance = result.minAttendance || 80;
             this.renderData();
           }
           resolve();
@@ -98,13 +98,13 @@ class PopupManager {
 
   renderSubjects() {
     const subjectList = document.getElementById('subject-list');
-    
+
     if (this.attendanceData.length === 0) {
       subjectList.innerHTML = '<div class="no-data">No subjects found</div>';
       return;
     }
 
-    const minAttendance = this.minAttendance || 75;
+    const minAttendance = this.minAttendance || 80;
 
     subjectList.innerHTML = this.attendanceData.map(subject => {
       const bunkContent = this.getBunkContent(subject);
