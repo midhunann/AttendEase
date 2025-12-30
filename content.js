@@ -376,33 +376,43 @@ class AmritaAttendanceTracker {
     return 'danger';
   }
 
-  getBunkContent(subject) {
-    if (subject.calculations.canBunk > 0) {
-      return `
-        <div class="bunk-section">
-          <div class="bunk-text-top">Go Bunk</div>
-          <div class="bunk-number">${subject.calculations.canBunk}</div>
-          <div class="bunk-text-bottom">classes</div>
-        </div>
-      `;
-    } else if (subject.status === 'danger') {
-      return `
-        <div class="bunk-section">
-          <div class="bunk-text-top">Attend</div>
-          <div class="bunk-number">${subject.calculations.needToAttend}</div>
-          <div class="bunk-text-bottom">classes</div>
-        </div>
-      `;
-    } else {
-      return `
-        <div class="bunk-section">
-          <div class="bunk-text-top">Can Bunk</div>
-          <div class="bunk-number">0</div>
-          <div class="bunk-text-bottom">classes</div>
-        </div>
-      `;
-    }
+getBunkContent(subject) {
+  const canBunk = subject.calculations.canBunk;
+  const needToAttend = subject.calculations.needToAttend;
+
+  if (canBunk > 0) {
+    const label = canBunk === 1 ? "class" : "classes";
+
+    return `
+      <div class="bunk-section">
+        <div class="bunk-text-top">Go Bunk</div>
+        <div class="bunk-number">${canBunk}</div>
+        <div class="bunk-text-bottom">${label}</div>
+      </div>
+    `;
   }
+
+  if (subject.status === "danger") {
+    const label = needToAttend === 1 ? "class" : "classes";
+
+    return `
+      <div class="bunk-section">
+        <div class="bunk-text-top">Attend</div>
+        <div class="bunk-number">${needToAttend}</div>
+        <div class="bunk-text-bottom">${label}</div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="bunk-section">
+      <div class="bunk-text-top">Can Bunk</div>
+      <div class="bunk-number">0</div>
+      <div class="bunk-text-bottom">classes</div>
+    </div>
+  `;
+}
+
 
   createFloatingWidget() {
     // Remove existing widget if any
