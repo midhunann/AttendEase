@@ -10,18 +10,18 @@ class AmritaAttendanceTracker {
     this.widget = null;
     this.isWidgetVisible = false;
     this.includeMedical = false; // Initialize medical leave toggle state
-    
+
     this.init();
   }
 
   init() {
     // console.log('[AttendEase] Content script initializing...');
-    
+
     // Load preferences (medical toggle and min attendance) from storage
     this.loadPreferences().then(() => {
       // Start with immediate check
       this.startTableDetection();
-      
+
       // Also set up a MutationObserver to watch for dynamic content loading
       this.setupMutationObserver();
     });
@@ -30,15 +30,17 @@ class AmritaAttendanceTracker {
   async loadPreferences() {
     try {
       if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-        const result = await chrome.storage.local.get(['includeMedical', 'minAttendance']);
+        const result = await chrome.storage.local.get(['includeMedical', 'minAttendance', 'widgetPosition']);
         this.includeMedical = result.includeMedical || false;
         this.MIN_ATTENDANCE = result.minAttendance || 75;
-        // console.log('[AttendEase] Loaded preferences - ML toggle:', this.includeMedical, 'Min Attendance:', this.MIN_ATTENDANCE);
+        this.widgetPosition = result.widgetPosition || null;
+        // console.log('[AttendEase] Loaded preferences - ML toggle:', this.includeMedical, 'Min Attendance:', this.MIN_ATTENDANCE, 'Position:', this.widgetPosition);
       }
     } catch (error) {
       console.error('[AttendEase] Failed to load preferences:', error);
       this.includeMedical = false;
       this.MIN_ATTENDANCE = 75;
+      this.widgetPosition = null;
     }
   }
 
@@ -75,21 +77,21 @@ class AmritaAttendanceTracker {
     // Watch for changes in the DOM that might indicate data loading
     const observer = new MutationObserver((mutations) => {
       let shouldCheck = false;
-      
+
       mutations.forEach((mutation) => {
         if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
           // Check if any added nodes contain table data
           mutation.addedNodes.forEach((node) => {
             if (node.nodeType === 1) { // Element node
-              if (node.tagName === 'TR' || node.querySelector('tr') || 
-                  node.tagName === 'TABLE' || node.querySelector('table')) {
+              if (node.tagName === 'TR' || node.querySelector('tr') ||
+                node.tagName === 'TABLE' || node.querySelector('table')) {
                 shouldCheck = true;
               }
             }
           });
         }
       });
-      
+
       if (shouldCheck && this.tableData.length === 0) {
         // console.log('[AttendEase] DOM changes detected, checking for attendance data...');
         setTimeout(() => {
@@ -107,11 +109,11 @@ class AmritaAttendanceTracker {
 
   checkAndUpdateData() {
     // Quick check if we now have data
-    const table = document.getElementById('home_tab') || 
-                  document.querySelector('table[class*="attendance"]') ||
-                  document.querySelector('table.table') ||
-                  document.querySelector('.table-responsive table');
-                  
+    const table = document.getElementById('home_tab') ||
+      document.querySelector('table[class*="attendance"]') ||
+      document.querySelector('table.table') ||
+      document.querySelector('.table-responsive table');
+
     if (table) {
       const rows = table.querySelectorAll('tr');
       const dataRows = Array.from(rows).filter((row, index) => {
@@ -120,7 +122,7 @@ class AmritaAttendanceTracker {
         const cells = row.querySelectorAll('td, th');
         return cells.length >= 5;
       });
-      
+
       if (dataRows.length > 0 && this.tableData.length === 0) {
         // console.log('[AttendEase] New data detected, processing...');
         this.scrapeAttendanceData();
@@ -136,25 +138,25 @@ class AmritaAttendanceTracker {
     return new Promise((resolve, reject) => {
       let attempts = 0;
       const maxAttempts = 40; // 20 seconds max (increased timeout)
-      
+
       const checkTable = () => {
         attempts++;
         // console.log(`[AttendEase] Looking for table, attempt ${attempts}/${maxAttempts}`);
-        
+
         // Try multiple possible table selectors
         let table = document.getElementById('home_tab');
-        
+
         // If home_tab doesn't exist, try other common table IDs/classes
         if (!table) {
           table = document.querySelector('table[class*="attendance"]') ||
-                  document.querySelector('table.table') ||
-                  document.querySelector('.table-responsive table') ||
-                  document.querySelector('#attendance_table') ||
-                  document.querySelector('[id*="tab"] table');
+            document.querySelector('table.table') ||
+            document.querySelector('.table-responsive table') ||
+            document.querySelector('#attendance_table') ||
+            document.querySelector('[id*="tab"] table');
         }
-        
+
         // console.log('[AttendEase] Table element found:', !!table);
-        
+
         if (table) {
           // Check for data rows - be more flexible about the structure
           // Amrita uses th elements for all cells, not just headers
@@ -165,10 +167,10 @@ class AmritaAttendanceTracker {
             const cells = row.querySelectorAll('td, th');
             return cells.length >= 5; // At least 5 columns for attendance data
           });
-          
+
           // console.log('[AttendEase] Total rows found:', rows.length);
           // console.log('[AttendEase] Data rows with sufficient columns:', dataRows.length);
-          
+
           if (dataRows.length > 0) {
             // console.log('[AttendEase] Table ready with data!');
             // Store the table reference for later use
@@ -177,7 +179,7 @@ class AmritaAttendanceTracker {
             return;
           }
         }
-        
+
         if (attempts >= maxAttempts) {
           console.error('[AttendEase] Table not found after maximum attempts');
           // console.log('[AttendEase] Available tables on page:');
@@ -188,7 +190,7 @@ class AmritaAttendanceTracker {
           reject(new Error('Table not found'));
           return;
         }
-        
+
         setTimeout(checkTable, 500);
       };
       checkTable();
@@ -197,11 +199,11 @@ class AmritaAttendanceTracker {
 
   scrapeAttendanceData() {
     // Use the table we found in waitForTable, or try to find it again
-    const table = this.attendanceTable || document.getElementById('home_tab') || 
-                  document.querySelector('table[class*="attendance"]') ||
-                  document.querySelector('table.table') ||
-                  document.querySelector('.table-responsive table');
-                  
+    const table = this.attendanceTable || document.getElementById('home_tab') ||
+      document.querySelector('table[class*="attendance"]') ||
+      document.querySelector('table.table') ||
+      document.querySelector('.table-responsive table');
+
     if (!table) {
       console.error('[AttendEase] Table not found during scraping');
       return;
@@ -211,19 +213,19 @@ class AmritaAttendanceTracker {
 
     // Get all rows - Amrita table structure has all rows directly under table
     const allRows = table.querySelectorAll('tr');
-    
+
     // Skip the first row (header row) and process data rows
     const rows = Array.from(allRows).slice(1);
 
     // console.log('[AttendEase] Found', rows.length, 'data rows to process');
-    
+
     this.tableData = [];
 
     rows.forEach((row, index) => {
       // Amrita uses th elements for all cells, not td
       const cells = row.querySelectorAll('th');
       // console.log(`[AttendEase] Row ${index + 1}: ${cells.length} cells`);
-      
+
       if (cells.length < 9) {
         console.warn(`[AttendEase] Row ${index + 1} has insufficient cells (${cells.length}), skipping`);
         return;
@@ -235,7 +237,7 @@ class AmritaAttendanceTracker {
       // Based on the table structure:
       // 0: Sl No, 1: Class Name, 2: Course (Code<br>Name), 3: Faculty, 
       // 4: Total, 5: Present, 6: Duty Leave, 7: Absent, 8: Percentage, 9: Medical
-      
+
       const slNo = cells[0].textContent.trim();
       const className = cells[1].textContent.trim();
       const courseInfo = cells[2].innerHTML; // Contains course code and name
@@ -250,7 +252,7 @@ class AmritaAttendanceTracker {
       // Extract course code and name from the course info cell
       let courseCode = '';
       let courseName = '';
-      
+
       if (courseInfo.includes('<br>')) {
         const parts = courseInfo.split('<br>');
         courseCode = parts[0].trim();
@@ -269,10 +271,10 @@ class AmritaAttendanceTracker {
       // Calculate effective attendance including medical leave if toggle is on
       const effectivePresent = present + dutyLeave + (this.includeMedical ? medical : 0);
       const effectiveAttendance = (effectivePresent / total) * 100;
-      
+
       // Debug: Log the attendance calculation
       // console.log(`[AttendEase] ${courseCode}: Present=${present}, DutyLeave=${dutyLeave}, Medical=${medical}, Total=${total}, ML=${this.includeMedical}, Calculated=${effectiveAttendance.toFixed(1)}%`);
-      
+
       const subjectData = {
         id: index,
         serialNumber: slNo,
@@ -293,7 +295,7 @@ class AmritaAttendanceTracker {
       // console.log(`[AttendEase] Processed subject:`, subjectData);
       this.tableData.push(subjectData);
     });
-    
+
     // console.log('[AttendEase] Final scraped data:', this.tableData);
   }
 
@@ -325,11 +327,11 @@ class AmritaAttendanceTracker {
       // Calculate how many classes can be bunked while maintaining 75%
       let canBunk = 0;
       let testTotal = total;
-      
+
       while (canBunk < 1000) { // Safety limit
         testTotal++; // Test bunking one more class
         const newPercentage = (effectivePresent / testTotal) * 100;
-        
+
         if (newPercentage >= this.MIN_ATTENDANCE) {
           canBunk++;
         } else {
@@ -338,7 +340,7 @@ class AmritaAttendanceTracker {
       }
 
       results.canBunk = Math.max(0, canBunk);
-      results.message = results.canBunk > 0 
+      results.message = results.canBunk > 0
         ? `You can bunk ${results.canBunk} more classes and stay ≥75%`
         : 'Cannot bunk any more classes';
     } else {
@@ -376,42 +378,42 @@ class AmritaAttendanceTracker {
     return 'danger';
   }
 
-getBunkContent(subject) {
-  const canBunk = subject.calculations.canBunk;
-  const needToAttend = subject.calculations.needToAttend;
+  getBunkContent(subject) {
+    const canBunk = subject.calculations.canBunk;
+    const needToAttend = subject.calculations.needToAttend;
 
-  if (canBunk > 0) {
-    const label = canBunk === 1 ? "class" : "classes";
+    if (canBunk > 0) {
+      const label = canBunk === 1 ? "class" : "classes";
 
-    return `
+      return `
       <div class="bunk-section">
         <div class="bunk-text-top">Go Bunk</div>
         <div class="bunk-number">${canBunk}</div>
         <div class="bunk-text-bottom">${label}</div>
       </div>
     `;
-  }
+    }
 
-  if (subject.status === "danger") {
-    const label = needToAttend === 1 ? "class" : "classes";
+    if (subject.status === "danger") {
+      const label = needToAttend === 1 ? "class" : "classes";
 
-    return `
+      return `
       <div class="bunk-section">
         <div class="bunk-text-top">Attend</div>
         <div class="bunk-number">${needToAttend}</div>
         <div class="bunk-text-bottom">${label}</div>
       </div>
     `;
-  }
+    }
 
-  return `
+    return `
     <div class="bunk-section">
       <div class="bunk-text-top">Can Bunk</div>
       <div class="bunk-number">0</div>
       <div class="bunk-text-bottom">classes</div>
     </div>
   `;
-}
+  }
 
 
   createFloatingWidget() {
@@ -464,7 +466,7 @@ getBunkContent(subject) {
 
     document.body.appendChild(this.widget);
     this.attachEventListeners();
-    
+
     // Show widget after a brief delay
     setTimeout(() => {
       this.showWidget();
@@ -486,11 +488,11 @@ getBunkContent(subject) {
       minAttendanceSelect.addEventListener('change', async (e) => {
         const newMinAttendance = parseInt(e.target.value);
         this.MIN_ATTENDANCE = newMinAttendance;
-        
+
         if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
           await chrome.storage.local.set({ minAttendance: newMinAttendance });
         }
-        
+
         this.updateWithTransition();
       });
     }
@@ -519,31 +521,46 @@ getBunkContent(subject) {
   makeDraggable() {
     const header = this.widget.querySelector('.widget-header');
     let isDragging = false;
-    let currentX;
-    let currentY;
+    let currentX = 0;
+    let currentY = 0;
     let initialX;
     let initialY;
-    let xOffset = 0;
-    let yOffset = 0;
+
+    // Initialize offsets from saved position or current position
+    const rect = this.widget.getBoundingClientRect();
+    let xOffset = this.widgetPosition ? this.widgetPosition.x : rect.left;
+    let yOffset = this.widgetPosition ? this.widgetPosition.y : rect.top;
+
+    // Apply initial position if it's custom
+    if (this.widgetPosition) {
+      this.widget.style.setProperty('transform', `translate3d(${xOffset}px, ${yOffset}px, 0)`, 'important');
+      this.widget.classList.add('has-custom-position');
+    }
 
     // Add visual feedback for draggable area
     header.style.cursor = 'move';
-    
+
     header.addEventListener('mousedown', (e) => {
       // Don't start dragging if clicking on control buttons or GitHub icon
-      if (e.target.classList.contains('control-btn') || 
-          e.target.classList.contains('github-icon') ||
-          e.target.closest('.github-icon')) return;
-      
+      if (e.target.classList.contains('control-btn') ||
+        e.target.classList.contains('github-icon') ||
+        e.target.closest('.github-icon')) return;
+
+      // Update offsets to latest position before starting drag
+      const currentRect = this.widget.getBoundingClientRect();
+      xOffset = currentRect.left;
+      yOffset = currentRect.top;
+
+      currentX = xOffset;
+      currentY = yOffset;
+
       initialX = e.clientX - xOffset;
       initialY = e.clientY - yOffset;
 
       if (e.target === header || header.contains(e.target)) {
         isDragging = true;
         header.style.cursor = 'grabbing';
-        this.widget.style.zIndex = '1000000'; // Bring to front while dragging
-        
-        // Add dragging class for visual feedback
+        this.widget.style.zIndex = '1000000';
         this.widget.classList.add('dragging');
       }
     });
@@ -553,19 +570,20 @@ getBunkContent(subject) {
         e.preventDefault();
         currentX = e.clientX - initialX;
         currentY = e.clientY - initialY;
-        
-        // Keep widget within viewport bounds
+
+        // Restrict left/right, allow flexible bottom
         const rect = this.widget.getBoundingClientRect();
         const maxX = window.innerWidth - rect.width;
-        const maxY = window.innerHeight - rect.height;
-        
+        const minY = 0;
+        const maxY = window.innerHeight - 30; // Still allow dragging down almost completely
+
         currentX = Math.max(0, Math.min(currentX, maxX));
-        currentY = Math.max(0, Math.min(currentY, maxY));
-        
+        currentY = Math.max(minY, Math.min(currentY, maxY));
+
         xOffset = currentX;
         yOffset = currentY;
 
-        this.widget.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
+        this.widget.style.setProperty('transform', `translate3d(${currentX}px, ${currentY}px, 0)`, 'important');
       }
     });
 
@@ -576,37 +594,20 @@ getBunkContent(subject) {
         isDragging = false;
         header.style.cursor = 'move';
         this.widget.style.zIndex = '999999'; // Reset z-index
-        
+
         // Remove dragging class
         this.widget.classList.remove('dragging');
-        
-        // Save position to localStorage for persistence
+
+        // Save position to storage for persistence
         this.saveWidgetPosition(currentX, currentY);
+        this.widget.classList.add('has-custom-position');
       }
     });
-
-    // Load saved position
-    this.loadWidgetPosition();
   }
 
   saveWidgetPosition(x, y) {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('attendease-widget-position', JSON.stringify({ x, y }));
-    }
-  }
-
-  loadWidgetPosition() {
-    if (typeof localStorage !== 'undefined') {
-      const saved = localStorage.getItem('attendease-widget-position');
-      if (saved) {
-        try {
-          const { x, y } = JSON.parse(saved);
-          this.widget.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-        } catch (e) {
-          // If parsing fails, use default position
-          console.warn('Failed to parse saved widget position');
-        }
-      }
+    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+      chrome.storage.local.set({ widgetPosition: { x, y } });
     }
   }
 
@@ -631,10 +632,10 @@ getBunkContent(subject) {
   generateSubjectCards() {
     return this.tableData.map(subject => {
       const bunkContent = this.getBunkContent(subject);
-      const attendance = subject.dutyLeave > 0 ? 
+      const attendance = subject.dutyLeave > 0 ?
         `${subject.present}+${subject.dutyLeave}${this.includeMedical && subject.medical > 0 ? '+' + subject.medical : ''}/${subject.total}` :
         `${subject.present}${this.includeMedical && subject.medical > 0 ? '+' + subject.medical : ''}/${subject.total}`;
-      
+
       return `
         <div class="subject-card status-${subject.status}">
           <div class="subject-card-content">
@@ -673,7 +674,7 @@ getBunkContent(subject) {
 
     subjectsList.style.transition = 'opacity 0.3s ease';
     subjectsList.style.opacity = '0';
-    
+
     setTimeout(() => {
       this.scrapeAttendanceData();
       this.updateWidgetContent();
@@ -720,7 +721,7 @@ if (document.readyState === 'loading') {
 if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     // console.log('[AttendEase] Received message:', request);
-    
+
     if (request.action === 'getAttendanceData') {
       try {
         const tracker = window.attendanceTracker;

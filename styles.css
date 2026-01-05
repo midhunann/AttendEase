@@ -2,10 +2,9 @@
 
 .amrita-widget {
   position: fixed !important;
-  top: 85px !important;
-  right: 20px !important;
+  top: 0 !important;
+  left: 0 !important;
   width: 420px !important;
-  max-height: 80vh !important;
   background: #ffffff !important;
   border-radius: 16px !important;
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25) !important;
@@ -15,14 +14,18 @@
   line-height: 1.4 !important;
   border: 1px solid #e1e5e9 !important;
   overflow: hidden !important;
-  transition: all 0.3s ease !important;
-  transform: translate3d(0, 0, 0) !important;
+  transition: opacity 0.3s ease, transform 0.3s ease !important;
+  transform: translate3d(calc(100vw - 440px), 85px, 0) !important;
   backdrop-filter: blur(10px) !important;
+}
+
+.amrita-widget.dragging {
+  transition: none !important;
 }
 
 .amrita-widget.hidden {
   opacity: 0 !important;
-  transform: translate3d(400px, 0, 0) !important;
+  transform: translate3d(100vw, 85px, 0) !important;
   pointer-events: none !important;
 }
 
@@ -92,7 +95,8 @@
   display: flex !important;
   gap: 8px !important;
   align-items: center !important;
-  height: 28px !important; /* Match the height of control buttons */
+  height: 28px !important;
+  /* Match the height of control buttons */
 }
 
 /* Min Attendance Dropdown */
@@ -150,7 +154,8 @@
   display: flex !important;
   align-items: center !important;
   position: relative !important;
-  height: 28px !important; /* Match the height of control buttons */
+  height: 28px !important;
+  /* Match the height of control buttons */
 }
 
 .ml-toggle {
@@ -207,18 +212,18 @@
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
 }
 
-.ml-toggle:checked + .ml-toggle-label {
+.ml-toggle:checked+.ml-toggle-label {
   background: rgba(255, 255, 255, 0.9) !important;
   box-shadow: inset 0 1px 3px rgba(191, 13, 79, 0.2) !important;
 }
 
-.ml-toggle:checked + .ml-toggle-label::before {
+.ml-toggle:checked+.ml-toggle-label::before {
   transform: translateX(28px) !important;
   background: #bf0d4f !important;
   box-shadow: 0 2px 4px rgba(191, 13, 79, 0.3) !important;
 }
 
-.ml-toggle:checked + .ml-toggle-label .ml-text {
+.ml-toggle:checked+.ml-toggle-label .ml-text {
   color: #bf0d4f !important;
   right: 4px !important;
   transform: translateX(-28px) !important;
@@ -247,9 +252,9 @@
 
 /* Smooth transitions for subject cards */
 .subject-card {
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .subjects-list {
@@ -258,9 +263,30 @@
 
 /* Widget Content */
 .widget-content {
-  padding: 16px !important;
-  max-height: calc(80vh - 50px) !important;
+  padding: 12px 16px !important;
+  max-height: 480px !important;
   overflow-y: auto !important;
+  position: relative !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #c1c8cd #f1f3f4 !important;
+}
+
+/* Scroll Fade Indicators */
+.amrita-widget::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 60px !important;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0) 100%) !important;
+  pointer-events: none !important;
+  z-index: 10 !important;
+  transition: opacity 0.3s ease !important;
+}
+
+.amrita-widget.minimized::after {
+  display: none !important;
 }
 
 .widget-content::-webkit-scrollbar {
@@ -286,11 +312,11 @@
 /* Subject Cards */
 .subject-card {
   border-radius: 12px !important;
-  padding: 8px 8px 0 8px !important;
+  padding: 6px 8px 0 8px !important;
   border-left: 4px solid #ddd !important;
   background: #fafafa !important;
   transition: all 0.3s ease !important;
-  margin-bottom: 8px !important;
+  margin-bottom: 6px !important;
   position: relative !important;
   overflow: hidden !important;
 }
@@ -393,7 +419,7 @@
   justify-content: center !important;
   min-width: 70px !important;
   min-height: 50px !important;
-  background: rgba(255,255,255,0.8) !important;
+  background: rgba(255, 255, 255, 0.8) !important;
   border-radius: 6px !important;
   padding: 6px !important;
 }
@@ -402,7 +428,7 @@
 .progress-bottom-border {
   position: relative !important;
   height: 6px !important;
-  background: rgba(0,0,0,0.1) !important;
+  background: rgba(0, 0, 0, 0.1) !important;
   border-radius: 0 0 12px 12px !important;
   overflow: hidden !important;
   display: flex !important;
@@ -426,7 +452,7 @@
   top: 0 !important;
   width: 1px !important;
   height: 100% !important;
-  background: rgba(255,255,255,0.8) !important;
+  background: rgba(255, 255, 255, 0.8) !important;
   z-index: 2 !important;
 }
 
@@ -449,16 +475,18 @@
 }
 
 /* Color variations for progress bottom border */
-.progress-fill.safe { 
-  background: linear-gradient(90deg, #28a745, #20c997) !important; 
+.progress-fill.safe {
+  background: linear-gradient(90deg, #28a745, #20c997) !important;
   border-radius: 0 0 12px 12px !important;
 }
-.progress-fill.warning { 
-  background: linear-gradient(90deg, #ffc107, #fd7e14) !important; 
+
+.progress-fill.warning {
+  background: linear-gradient(90deg, #ffc107, #fd7e14) !important;
   border-radius: 0 0 12px 12px !important;
 }
-.progress-fill.danger { 
-  background: linear-gradient(90deg, #dc3545, #e91e63) !important; 
+
+.progress-fill.danger {
+  background: linear-gradient(90deg, #dc3545, #e91e63) !important;
   border-radius: 0 0 12px 12px !important;
 }
 
@@ -496,7 +524,7 @@
   min-height: 50px !important;
   width: 100% !important;
   border-radius: 6px !important;
-  background: rgba(255,255,255,0.9) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
   transition: all 0.2s ease !important;
 }
 
@@ -576,7 +604,7 @@
   font-weight: 700 !important;
   font-size: 24px !important;
   color: white !important;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
   border-radius: 8px !important;
   display: flex !important;
   align-items: center !important;
@@ -587,14 +615,16 @@
   min-width: 90px !important;
 }
 
-.attendance-percentage.safe { 
-  background: linear-gradient(135deg, #28a745, #20c997) !important; 
+.attendance-percentage.safe {
+  background: linear-gradient(135deg, #28a745, #20c997) !important;
 }
-.attendance-percentage.warning { 
-  background: linear-gradient(135deg, #ffc107, #ff8c00) !important; 
+
+.attendance-percentage.warning {
+  background: linear-gradient(135deg, #ffc107, #ff8c00) !important;
 }
-.attendance-percentage.danger { 
-  background: linear-gradient(135deg, #dc3545, #e91e63) !important; 
+
+.attendance-percentage.danger {
+  background: linear-gradient(135deg, #dc3545, #e91e63) !important;
 }
 
 /* Responsive Design */
@@ -613,14 +643,19 @@
     opacity: 0;
     transform: translate3d(400px, 0, 0);
   }
+
   to {
     opacity: 1;
     transform: translate3d(0, 0, 0);
   }
 }
 
-.amrita-widget:not(.hidden) {
+.amrita-widget:not(.hidden):not(.has-custom-position) {
   animation: slideInRight 0.3s ease-out !important;
+}
+
+.amrita-widget.has-custom-position {
+  animation: none !important;
 }
 
 /* Notification styles for critical attendance */
@@ -632,9 +667,11 @@
   0% {
     box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
   }
+
   70% {
     box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
   }
+
   100% {
     box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
   }
@@ -645,7 +682,7 @@
   .amrita-widget {
     border: 2px solid #000 !important;
   }
-  
+
   .subject-card {
     border: 1px solid #666 !important;
   }
@@ -653,6 +690,7 @@
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
+
   .amrita-widget,
   .progress-fill,
   .control-btn,
