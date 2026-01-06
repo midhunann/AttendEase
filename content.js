@@ -11,6 +11,8 @@ class AmritaAttendanceTracker {
     this.isWidgetVisible = false;
     this.includeMedical = false; // Initialize medical leave toggle state
     
+    this.xOffset = 0;
+    this.yOffset = 0;
     this.init();
   }
 
@@ -526,8 +528,6 @@ getBunkContent(subject) {
     let currentY;
     let initialX;
     let initialY;
-    let xOffset = 0;
-    let yOffset = 0;
 
     // Add visual feedback for draggable area
     header.style.cursor = 'move';
@@ -538,8 +538,8 @@ getBunkContent(subject) {
           e.target.classList.contains('github-icon') ||
           e.target.closest('.github-icon')) return;
       
-      initialX = e.clientX - xOffset;
-      initialY = e.clientY - yOffset;
+      initialX = e.clientX - this.xOffset;
+      initialY = e.clientY - this.yOffset;
 
       if (e.target === header || header.contains(e.target)) {
         isDragging = true;
@@ -565,8 +565,8 @@ getBunkContent(subject) {
         currentX = Math.max(0, Math.min(currentX, maxX));
         currentY = Math.max(0, Math.min(currentY, maxY));
         
-        xOffset = currentX;
-        yOffset = currentY;
+        this.xOffset = currentX;
+        this.yOffset = currentY;
 
         this.widget.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
       }
@@ -583,8 +583,8 @@ getBunkContent(subject) {
         // Remove dragging class
         this.widget.classList.remove('dragging');
         
-        // Save position to localStorage for persistence
-        this.saveWidgetPosition(currentX, currentY);
+        // Save position to storage for persistence
+        this.saveWidgetPosition(this.xOffset, this.yOffset);
       }
     });
 
@@ -593,23 +593,32 @@ getBunkContent(subject) {
   }
 
   saveWidgetPosition(x, y) {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('attendease-widget-position', JSON.stringify({ x, y }));
+    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+      chrome.storage.local.set({ widgetPosition: { x, y } });
     }
   }
 
   loadWidgetPosition() {
-    if (typeof localStorage !== 'undefined') {
-      const saved = localStorage.getItem('attendease-widget-position');
-      if (saved) {
-        try {
-          const { x, y } = JSON.parse(saved);
-          this.widget.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-        } catch (e) {
-          // If parsing fails, use default position
-          console.warn('Failed to parse saved widget position');
+    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+      chrome.storage.local.get(['widgetPosition'], (result) => {
+        if (result.widgetPosition) {
+          const { x, y } = result.widgetPosition;
+          this.xOffset = x;
+          this.yOffset = y;
+          if (this.widget) {
+            this.widget.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+          }
+        } else {
+          // Default position: top-right corner
+          const defaultX = window.innerWidth - 440; // 420px width + 20px margin
+          const defaultY = 85;
+          this.xOffset = defaultX;
+          this.yOffset = defaultY;
+          if (this.widget) {
+            this.widget.style.transform = `translate3d(${defaultX}px, ${defaultY}px, 0)`;
+          }
         }
-      }
+      });
     }
   }
 

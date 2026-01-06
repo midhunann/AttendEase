@@ -2,8 +2,6 @@
 
 .amrita-widget {
   position: fixed !important;
-  top: 85px !important;
-  right: 20px !important;
   width: 420px !important;
   max-height: 80vh !important;
   background: #ffffff !important;
@@ -16,7 +14,7 @@
   border: 1px solid #e1e5e9 !important;
   overflow: hidden !important;
   transition: all 0.3s ease !important;
-  transform: translate3d(0, 0, 0) !important;
+  transform: translate3d(0, 0, 0);
   backdrop-filter: blur(10px) !important;
 }
 
