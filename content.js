@@ -507,6 +507,9 @@ getBunkContent(subject) {
 
     minimizeBtn.addEventListener('click', () => {
       this.widget.classList.toggle('minimized');
+      const isMinimized = this.widget.classList.contains('minimized');
+      minimizeBtn.textContent = isMinimized ? '+' : '−';
+      minimizeBtn.title = isMinimized ? 'Maximize' : 'Minimize';
     });
 
     closeBtn.addEventListener('click', () => {
