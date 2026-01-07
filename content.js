@@ -473,8 +473,10 @@ class AmritaAttendanceTracker {
       </div>
     `;
 
-    document.body.appendChild(this.widget);
-    this.attachEventListeners();
+    document.body.appendChild(this.widget);    
+    // Apply saved position before showing the widget
+    this.applyWidgetPosition();
+        this.attachEventListeners();
 
     // Show widget after a brief delay
     setTimeout(() => {
@@ -598,9 +600,6 @@ class AmritaAttendanceTracker {
         this.saveWidgetPosition(currentX, currentY);
       }
     });
-
-    // Load and apply saved position
-    this.applyWidgetPosition();
   }
 
   saveWidgetPosition(x, y) {
@@ -613,7 +612,7 @@ class AmritaAttendanceTracker {
     if (this.widget && this.widgetPosition) {
       const { x, y } = this.widgetPosition;
       // Use setProperty with priority to override CSS !important if necessary
-      this.widget.style.setProperty('transform', `translate3d(${x}px, ${y}px, 0)`);
+      this.widget.style.setProperty('transform', `translate3d(${x}px, ${y}px, 0)`, 'important');
     }
   }
 
