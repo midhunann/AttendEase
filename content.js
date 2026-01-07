@@ -460,9 +460,13 @@ class AmritaAttendanceTracker {
               <span class="ml-text">ML</span>
             </label>
           </div>
-          <button id="refresh-btn" class="control-btn" title="Refresh Data">↻</button>
-          <button id="minimize-btn" class="control-btn" title="Minimize">−</button>
-          <button id="close-btn" class="control-btn" title="Close">×</button>
+          <button id="close-btn" class="control-btn close" title="Close">×</button>
+          <button id="minimize-btn" class="control-btn minimize" title="Minimize">−</button>
+          <button id="refresh-btn" class="control-btn refresh" title="Refresh Data">
+            <svg viewBox="0 0 24 24" width="14" height="14">
+              <path fill="currentColor" d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z" />
+            </svg>
+          </button>
         </div>
       </div>
       
@@ -521,8 +525,21 @@ class AmritaAttendanceTracker {
     minimizeBtn.addEventListener('click', () => {
       this.widget.classList.toggle('minimized');
       const isMinimized = this.widget.classList.contains('minimized');
-      minimizeBtn.textContent = isMinimized ? '+' : '−';
-      minimizeBtn.title = isMinimized ? 'Maximize' : 'Minimize';
+      
+      if (isMinimized) {
+        // Change to Maximize icon (User-provided Custom Triangles)
+        minimizeBtn.innerHTML = `
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none">
+            <path d="M5 5H13L5 13V5Z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M19 19H11L19 11V19Z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+        `;
+        minimizeBtn.title = 'Maximize';
+      } else {
+        // Change back to Minimize icon (Minus)
+        minimizeBtn.innerHTML = '−';
+        minimizeBtn.title = 'Minimize';
+      }
     });
 
     closeBtn.addEventListener('click', () => {
