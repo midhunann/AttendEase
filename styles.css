@@ -229,22 +229,52 @@
 }
 
 .control-btn {
-  background: rgba(255, 255, 255, 0.2) !important;
+  background: none !important;
   border: none !important;
   color: white !important;
-  width: 28px !important;
-  height: 28px !important;
+  width: 24px !important;
+  height: 24px !important;
   border-radius: 50% !important;
   cursor: pointer !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  font-size: 14px !important;
-  transition: all 0.3s ease !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  transition: all 0.2s ease !important;
+  position: relative !important;
+}
+
+.control-btn svg {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.control-btn.close {
+  background-color: #ff5f56 !important;
+  border: 0.5px solid #e0443e !important;
+  color: #4b0001 !important;
+}
+
+.control-btn.minimize {
+  background-color: #ffbd2e !important;
+  border: 0.5px solid #dea123 !important;
+  color: #995700 !important;
+}
+
+.control-btn.refresh {
+  background-color: #27c93f !important;
+  border: 0.5px solid #1aab29 !important;
+  color: #006500 !important;
 }
 
 .control-btn:hover {
-  background: rgba(255, 255, 255, 0.3) !important;
+  filter: brightness(1.1) !important;
+}
+
+.control-btn:active {
+  filter: brightness(0.9) !important;
 }
 
 /* Smooth transitions for subject cards */
