@@ -3,6 +3,11 @@
   "name": "AttendEase",
   "version": "1.5.0",
   "description": "Sleek attendance tracker for Amrita students—instantly shows your safe bunks.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "attendease@midhunan.extension"
+    }
+  },
   "permissions": [
     "activeTab",
     "storage",
