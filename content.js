@@ -278,8 +278,12 @@ class AmritaAttendanceTracker {
       }
 
       // Calculate effective attendance including medical leave if toggle is on
-      const effectivePresent = present + dutyLeave + (this.includeMedical ? medical : 0);
-      const effectiveAttendance = (effectivePresent / total) * 100;
+        const adjustedTotal = this.includeMedical ? (total - medical) : total;
+        const effectivePresent = present + dutyLeave;
+        
+        const effectiveAttendance = adjustedTotal > 0 
+        ? (effectivePresent / adjustedTotal) * 100 
+        : 0;
 
       // Debug: Log the attendance calculation
       // console.log(`[AttendEase] ${courseCode}: Present=${present}, DutyLeave=${dutyLeave}, Medical=${medical}, Total=${total}, ML=${this.includeMedical}, Calculated=${effectiveAttendance.toFixed(1)}%`);
@@ -308,77 +312,81 @@ class AmritaAttendanceTracker {
     // console.log('[AttendEase] Final scraped data:', this.tableData);
   }
 
-  calculateScenarios(total, present, dutyLeave, medical, currentPercentage) {
-    const results = {};
-    const effectivePresent = present + dutyLeave + (this.includeMedical ? medical : 0);
+calculateScenarios(total, present, dutyLeave, medical, currentPercentage) {
+  const results = {};
 
-    // Safety check for edge cases
-    if (total <= 0) {
-      results.canBunk = 0;
-      results.needToAttend = 0;
-      results.message = 'No classes recorded';
-      return results;
-    }
+  // ✅ NEW LOGIC
+  const adjustedTotal = this.includeMedical ? (total - medical) : total;
+  const effectivePresent = present + dutyLeave;
 
-    // Validate input data consistency
-    if (effectivePresent > total) {
-      console.warn(`[AttendEase] Data consistency check: Present=${present}, DutyLeave=${dutyLeave}, Medical=${medical}, Total=${total}`);
-      results.canBunk = 0;
-      results.needToAttend = 0;
-      results.message = 'Data inconsistency detected';
-      return results;
-    }
-
-    // Calculate actual percentage including medical leave if enabled
-    const actualPercentage = (effectivePresent / total) * 100;
-
-    if (actualPercentage >= this.MIN_ATTENDANCE) {
-      // Calculate how many classes can be bunked while maintaining 75%
-      let canBunk = 0;
-      let testTotal = total;
-
-      while (canBunk < 1000) { // Safety limit
-        testTotal++; // Test bunking one more class
-        const newPercentage = (effectivePresent / testTotal) * 100;
-
-        if (newPercentage >= this.MIN_ATTENDANCE) {
-          canBunk++;
-        } else {
-          break;
-        }
-      }
-
-      results.canBunk = Math.max(0, canBunk);
-      results.message = results.canBunk > 0
-        ? `You can bunk ${results.canBunk} more classes and stay ≥75%`
-        : 'Cannot bunk any more classes';
-    } else {
-      // Calculate how many classes needed to reach 75%
-      let needToAttend = 0;
-      let futureTotal = total;
-      let futureEffectivePresent = effectivePresent;
-
-      // Use mathematical approach for better accuracy
-      const minAttendMath = Math.ceil((this.MIN_ATTENDANCE / 100 * total - effectivePresent) / (1 - this.MIN_ATTENDANCE / 100));
-
-      // Use iterative approach for validation
-      while ((futureEffectivePresent / futureTotal) * 100 < this.MIN_ATTENDANCE && needToAttend < 1000) {
-        futureTotal++;
-        futureEffectivePresent++; // Attending increases effective present
-        needToAttend++;
-      }
-
-      // Use the more conservative result
-      results.needToAttend = Math.max(needToAttend, minAttendMath, 0);
-      results.message = `Attend ${results.needToAttend} consecutive classes to reach 75%`;
-    }
-
-    // Additional safety checks
-    results.canBunk = Math.max(0, results.canBunk || 0);
-    results.needToAttend = Math.max(0, results.needToAttend || 0);
-
+  // Safety check
+  if (adjustedTotal <= 0) {
+    results.canBunk = 0;
+    results.needToAttend = 0;
+    results.message = 'No valid classes available';
     return results;
   }
+
+  // Validate consistency
+  if (effectivePresent > adjustedTotal) {
+    console.warn(`[AttendEase] Data issue: Present=${present}, DutyLeave=${dutyLeave}, Medical=${medical}, AdjustedTotal=${adjustedTotal}`);
+    results.canBunk = 0;
+    results.needToAttend = 0;
+    results.message = 'Data inconsistency detected';
+    return results;
+  }
+
+  const actualPercentage = (effectivePresent / adjustedTotal) * 100;
+
+  if (actualPercentage >= this.MIN_ATTENDANCE) {
+
+    let canBunk = 0;
+    let testTotal = adjustedTotal;
+
+    while (canBunk < 1000) {
+      testTotal++;
+
+      const newPercentage = (effectivePresent / testTotal) * 100;
+
+      if (newPercentage >= this.MIN_ATTENDANCE) {
+        canBunk++;
+      } else {
+        break;
+      }
+    }
+
+    results.canBunk = Math.max(0, canBunk);
+    results.message = results.canBunk > 0
+      ? `You can bunk ${results.canBunk} more classes and stay ≥${this.MIN_ATTENDANCE}%`
+      : 'Cannot bunk any more classes';
+
+  } else {
+
+    let needToAttend = 0;
+    let futureTotal = adjustedTotal;
+    let futurePresent = effectivePresent;
+
+    // improved formula using adjusted total
+    const minAttendMath = Math.ceil(
+      ((this.MIN_ATTENDANCE / 100) * adjustedTotal - effectivePresent) /
+      (1 - this.MIN_ATTENDANCE / 100)
+    );
+
+    while ((futurePresent / futureTotal) * 100 < this.MIN_ATTENDANCE && needToAttend < 1000) {
+      futureTotal++;
+      futurePresent++;
+      needToAttend++;
+    }
+
+    results.needToAttend = Math.max(needToAttend, minAttendMath, 0);
+    results.message = `Attend ${results.needToAttend} consecutive classes to reach ${this.MIN_ATTENDANCE}%`;
+  }
+
+  results.canBunk = Math.max(0, results.canBunk || 0);
+  results.needToAttend = Math.max(0, results.needToAttend || 0);
+
+  return results;
+}
 
   getStatus(percentage) {
     const warningThreshold = this.MIN_ATTENDANCE + 5;
@@ -637,9 +645,13 @@ class AmritaAttendanceTracker {
   generateSubjectCards() {
     return this.tableData.map(subject => {
       const bunkContent = this.getBunkContent(subject);
-      const attendance = subject.dutyLeave > 0 ?
-        `${subject.present}+${subject.dutyLeave}${this.includeMedical && subject.medical > 0 ? '+' + subject.medical : ''}/${subject.total}` :
-        `${subject.present}${this.includeMedical && subject.medical > 0 ? '+' + subject.medical : ''}/${subject.total}`;
+      const adjustedTotal = this.includeMedical 
+      ? (subject.total - subject.medical) 
+      : subject.total;
+    
+      const attendance = subject.dutyLeave > 0
+      ? `${subject.present}+${subject.dutyLeave}/${adjustedTotal}`
+      : `${subject.present}/${adjustedTotal}`;
 
       return `
         <div class="subject-card status-${subject.status}">
