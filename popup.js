@@ -31,7 +31,8 @@ class PopupManager {
           if (result.attendanceData && result.attendanceData.length > 0) {
             this.attendanceData = result.attendanceData;
             this.includeMedical = result.includeMedical || false;
-            this.minAttendance = result.minAttendance || 75;
+            const storedMinAttendance = Number(result.minAttendance);
+            this.minAttendance = Number.isFinite(storedMinAttendance) ? storedMinAttendance : 75;
             this.renderData();
           }
           resolve();
@@ -104,7 +105,7 @@ class PopupManager {
       return;
     }
 
-    const minAttendance = this.minAttendance || 75;
+    const minAttendance = Number.isFinite(this.minAttendance) ? this.minAttendance : 75;
 
     subjectList.innerHTML = this.attendanceData.map(subject => {
       const bunkContent = this.getBunkContent(subject);
