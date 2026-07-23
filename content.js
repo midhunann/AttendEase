@@ -333,8 +333,7 @@ class AmritaAttendanceTracker {
     const actualPercentage = (effectivePresent / total) * 100;
 
     if (actualPercentage >= this.MIN_ATTENDANCE) {
-      // Calculate how many classes can be bunked while maintaining 75%
-      let canBunk = 0;
+      // Calculate how many classes can be bunked while maintaining the configured attendance threshold      let canBunk = 0;
       let testTotal = total;
 
       while (canBunk < 1000) { // Safety limit
@@ -350,10 +349,10 @@ class AmritaAttendanceTracker {
 
       results.canBunk = Math.max(0, canBunk);
       results.message = results.canBunk > 0
-        ? `You can bunk ${results.canBunk} more classes and stay ≥75%`
+        ? `You can bunk ${results.canBunk} more classes and stay ≥${this.MIN_ATTENDANCE}%`
         : 'Cannot bunk any more classes';
     } else {
-      // Calculate how many classes needed to reach 75%
+      // Calculate how many classes needed to reach the configured attendance threshold
       let needToAttend = 0;
       let futureTotal = total;
       let futureEffectivePresent = effectivePresent;
@@ -370,12 +369,12 @@ class AmritaAttendanceTracker {
 
       // Use the more conservative result
       results.needToAttend = Math.max(needToAttend, minAttendMath, 0);
-      results.message = `Attend ${results.needToAttend} consecutive classes to reach 75%`;
-    }
+      results.message = `Attend ${results.needToAttend} consecutive classes to reach ${this.MIN_ATTENDANCE}%`;
 
-    // Additional safety checks
-    results.canBunk = Math.max(0, results.canBunk || 0);
-    results.needToAttend = Math.max(0, results.needToAttend || 0);
+      // Additional safety checks
+      results.canBunk = Math.max(0, results.canBunk || 0);
+      results.needToAttend = Math.max(0, results.needToAttend || 0);
+    }
 
     return results;
   }
