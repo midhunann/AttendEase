@@ -33,7 +33,8 @@ class AmritaAttendanceTracker {
       if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
         const result = await chrome.storage.local.get(['includeMedical', 'minAttendance', 'widgetPosition']);
         this.includeMedical = result.includeMedical || false;
-        this.MIN_ATTENDANCE = result.minAttendance || 75;
+        const storedMinAttendance = Number(result.minAttendance);
+        this.MIN_ATTENDANCE = Number.isFinite(storedMinAttendance) ? storedMinAttendance : 75;
 
         // Set default position if not saved (Right side, slightly down)
         if (result.widgetPosition) {
@@ -235,7 +236,7 @@ class AmritaAttendanceTracker {
       const cells = row.querySelectorAll('th');
       // console.log(`[AttendEase] Row ${index + 1}: ${cells.length} cells`);
 
-      if (cells.length < 9) {
+      if (cells.length < 10) {
         console.warn(`[AttendEase] Row ${index + 1} has insufficient cells (${cells.length}), skipping`);
         return;
       }
@@ -497,11 +498,11 @@ class AmritaAttendanceTracker {
     if (minAttendanceSelect) {
       minAttendanceSelect.value = this.MIN_ATTENDANCE;
       minAttendanceSelect.addEventListener('change', async (e) => {
-        const newMinAttendance = parseInt(e.target.value);
-        this.MIN_ATTENDANCE = newMinAttendance;
+        const newMinAttendance = parseInt(e.target.value, 10);
+        this.MIN_ATTENDANCE = Number.isFinite(newMinAttendance) ? newMinAttendance : 75;
 
         if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-          await chrome.storage.local.set({ minAttendance: newMinAttendance });
+          await chrome.storage.local.set({ minAttendance: this.MIN_ATTENDANCE });
         }
 
         this.updateWithTransition();
